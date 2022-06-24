@@ -22,5 +22,5 @@ model User {
   name      String  @unique
   status    Status  @default(OFFLINE)
   avatar    String?
-  intra_id  String
+  intra_id  String  @unique
 }
