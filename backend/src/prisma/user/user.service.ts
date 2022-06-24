@@ -13,4 +13,13 @@ export class UserService {
       where: userWhereUniqueInput,
     });
   }
+
+  async create(name: string, intra_id: string): Promise<User> {
+    return this.prisma.user.create({
+      data: {
+        name: name,
+        intra_id: intra_id,
+      },
+    });
+  }
 }

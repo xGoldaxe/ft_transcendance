@@ -1,6 +1,6 @@
 import { PassportStrategy } from '@nestjs/passport';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { AuthService } from './auth.service';
+import { AuthService } from '../auth.service';
 import { Strategy } from 'passport-oauth2';
 import { HttpService } from '@nestjs/axios';
 import { stringify } from 'querystring';
@@ -34,9 +34,7 @@ export class IntraStrategy extends PassportStrategy(Strategy, 'intra') {
         headers: { Authorization: `Bearer ${accessToken}` },
       })
       .toPromise();
-    if (!data) {
-      throw new UnauthorizedException();
-    }
-    return data.id;
+    if (!data) throw new UnauthorizedException();
+    return this.authService.retrieveUserFromToken(data);
   }
 }
