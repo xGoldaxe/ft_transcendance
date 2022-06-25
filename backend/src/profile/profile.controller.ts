@@ -1,5 +1,5 @@
 import { Controller, Get, Req, UseGuards } from '@nestjs/common';
-import { IntraAuthGuard } from 'src/auth/intra.guard';
+import { IntraAuthGuard } from 'src/auth/guards/intra.guard';
 
 @Controller('profile')
 export class ProfileController {
