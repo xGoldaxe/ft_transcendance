@@ -2,7 +2,7 @@ import { Controller, Get, Request, UseGuards } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { AuthService } from './auth.service';
 import { IntraAuthGuard } from './guards/intra.guard';
-import { JwtAuthGuard } from './guards/jwt.guard';
+import Jwt2FAGuard from './guards/jwt-2fa.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -15,7 +15,7 @@ export class AuthController {
   }
 
   @Get('user')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(Jwt2FAGuard)
   getAuthUser(@Request() req): User {
     return req.user;
   }

@@ -22,4 +22,24 @@ export class UserService {
       },
     });
   }
+  async setTwoFASecret(secret: string, id: number): Promise<User> {
+    return this.prisma.user.update({
+      where: {
+        id: id,
+      },
+      data: {
+        otp_secret: secret,
+      },
+    });
+  }
+  async turnOnTwoFA(id: number): Promise<User> {
+    return this.prisma.user.update({
+      where: {
+        id: id,
+      },
+      data: {
+        otp_enable: true,
+      },
+    });
+  }
 }

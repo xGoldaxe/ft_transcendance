@@ -9,24 +9,23 @@ import { ConfigModule } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { JwtAuthGuard } from './guards/jwt.guard';
+import { DoublefaService } from './doublefa/doublefa.service';
+import { DoublefaController } from './doublefa/doublefa.controller';
+import Jwt2FAGuard from './guards/jwt-2fa.guard';
+import { Jwt2FAStrategy } from './strategies/jwt_2fa.strategy';
 
 @Module({
-  imports: [
-    PrismaModule,
-    HttpModule,
-    ConfigModule,
-    JwtModule.register({
-      secret: 'aegpaegnapegn' /** @todo a changer */,
-      signOptions: { expiresIn: '60s' },
-    }),
-  ],
+  imports: [PrismaModule, HttpModule, ConfigModule, JwtModule],
   providers: [
     AuthService,
     IntraStrategy,
     JwtStrategy,
+    Jwt2FAStrategy,
     IntraAuthGuard,
     JwtAuthGuard,
+    Jwt2FAGuard,
+    DoublefaService,
   ],
-  controllers: [AuthController],
+  controllers: [AuthController, DoublefaController],
 })
 export class AuthModule {}

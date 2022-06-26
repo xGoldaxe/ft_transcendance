@@ -18,9 +18,11 @@ enum Status {
 }
 
 model User {
-  id        Int     @id @default(autoincrement())
-  name      String  @unique
-  status    Status  @default(OFFLINE)
-  avatar    String?
-  intra_id  String  @unique
+  id         Int     @id @default(autoincrement())
+  name       String  @unique
+  status     Status  @default(OFFLINE)
+  avatar     String?
+  otp_secret String?
+  otp_enable Boolean @default(false)
+  intra_id   String  @unique
 }

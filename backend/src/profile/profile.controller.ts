@@ -1,10 +1,10 @@
 import { Controller, Get, Req, UseGuards } from '@nestjs/common';
-import { IntraAuthGuard } from 'src/auth/guards/intra.guard';
+import Jwt2FAGuard from 'src/auth/guards/jwt-2fa.guard';
 
 @Controller('profile')
 export class ProfileController {
   @Get()
-  @UseGuards(IntraAuthGuard)
+  @UseGuards(Jwt2FAGuard)
   async showPersonnalPage(@Req() req): Promise<any> {
     return req.user;
   }
