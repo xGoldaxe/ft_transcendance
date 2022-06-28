@@ -47,7 +47,7 @@ export class DoublefaController {
   })
   @ApiOkResponse({
     description:
-      "L'utilisateur a demandé à activer le 2FA. Il faut qu'il le valide sur /profile/2fa/enable",
+      "L'utilisateur a demandé à activer le 2FA. Il faut qu'il le valide",
     content: { 'image/png': { schema: { type: 'string', format: 'binary' } } },
   })
   async register(@Res() response, @Req() request) {

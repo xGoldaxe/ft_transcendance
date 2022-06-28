@@ -1,25 +1,26 @@
 import {
-  Body,
   Controller,
   Get,
   HttpException,
   HttpStatus,
+  Param,
   Req,
   UseGuards,
-  UsePipes,
-  ValidationPipe,
 } from '@nestjs/common';
 import {
+  ApiBadRequestResponse,
+  ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
+  ApiParam,
   ApiSecurity,
   ApiTags,
 } from '@nestjs/swagger';
+import { FriendShipStatus } from '@prisma/client';
 import Jwt2FAGuard from 'src/auth/guards/jwt-2fa.guard';
 import { FriendsService } from 'src/prisma/friends/friends.service';
 import UserPublic from 'src/prisma/user/user.public.interface';
 import { UserService } from 'src/prisma/user/user.service';
-import { FriendStatusDTO } from './dto/friends-status.dto';
 
 @Controller('profile')
 @ApiSecurity('access-token')
@@ -49,21 +50,49 @@ export class ProfileController {
   @UseGuards(Jwt2FAGuard)
   @ApiOperation({
     summary:
-      "Récupérer la liste des demandes, bloquages et des amis de l'utilisateur, ou le lien avec un autre utilisateur",
+      "Récupérer la liste des demandes, bloquages et des amis de l'utilisateur",
   })
   @ApiOkResponse({
-    description:
-      "Contient la liste d'ami de l'utilisateur, ou sa relation avec l'utilisateur spécifié",
+    description: "Contient la liste d'ami de l'utilisateur",
   })
-  @UsePipes(new ValidationPipe({ transform: true }))
-  async getFriends(@Body() friendsQuery: FriendStatusDTO, @Req() req) {
-    if (!friendsQuery.friend) return this.friends.friends(req.user);
-    if (friendsQuery.friend == req.user.id)
+  async getFriends(@Req() req) {
+    return this.friends.friends(req.user);
+  }
+
+  @Get('/friends/:id')
+  @UseGuards(Jwt2FAGuard)
+  @ApiOperation({
+    summary: 'Récupérer le lien avec un autre utilisateur',
+  })
+  @ApiOkResponse({
+    description: "Contient la relation avec l'utilisateur spécifié",
+    content: {
+      'application/json': {
+        schema: {
+          type: 'string',
+          enum: Object.values(FriendShipStatus),
+        },
+      },
+    },
+  })
+  @ApiBadRequestResponse({
+    description: "L'utilisateur a demandé la relation avec son profile...",
+  })
+  @ApiNotFoundResponse({
+    description: 'Utilisateur spécifié introuvable',
+  })
+  @ApiParam({
+    name: 'id',
+    required: true,
+    type: 'number',
+  })
+  async getFriend(@Param('id') id: number, @Req() req) {
+    if (id == req.user.id)
       throw new HttpException(
         'Vous ne pouvez pas être amis avec vous même...',
         HttpStatus.BAD_REQUEST,
       );
-    const user = await this.users.user({ id: friendsQuery.friend });
+    const user = await this.users.user({ id: id });
     if (!user)
       throw new HttpException("User doesn't exists", HttpStatus.NOT_FOUND);
     return this.friends.friendsWith(req.user, user);
