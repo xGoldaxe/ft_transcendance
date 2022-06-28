@@ -30,6 +30,7 @@ export class AuthService {
           'JWT_ACCESS_TOKEN_EXPIRATION_TIME',
         )}s`,
       }),
+      '2fa_needed': user.otp_enable && !doublefa,
     };
   }
 }
