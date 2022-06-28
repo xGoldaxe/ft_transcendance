@@ -18,11 +18,30 @@ enum Status {
 }
 
 model User {
-  id         Int     @id @default(autoincrement())
-  name       String  @unique
-  status     Status  @default(OFFLINE)
-  avatar     String?
-  otp_secret String?
-  otp_enable Boolean @default(false)
-  intra_id   String  @unique
+  id              Int     @id @default(autoincrement())
+  name            String  @unique
+  status          Status  @default(OFFLINE)
+  avatar          String?
+  otp_secret      String?
+  otp_enable      Boolean @default(false)
+  intra_id        String  @unique
+  friendRequest   FriendShip[] @relation("friends_requests")
+  friendProposal  FriendShip[] @relation("friends_proposals")
+}
+
+enum FriendShipStatus {
+  WAITING
+  DENIED
+  ACCEPTED
+  BLOCKED
+}
+
+model FriendShip {
+  requester    User @relation("friends_requests", fields: [requesterId], references: [id])
+  requesterId  Int
+  receiver     User @relation("friends_proposals", fields: [receiverId], references: [id])
+  receiverId   Int
+  status       FriendShipStatus @default(WAITING)
+
+  @@id([requesterId, receiverId])
 }

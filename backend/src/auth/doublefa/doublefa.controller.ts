@@ -13,6 +13,7 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { ApiSecurity } from '@nestjs/swagger';
 import { UserService } from 'src/prisma/user/user.service';
 import { AuthService } from '../auth.service';
 import { JwtAuthGuard } from '../guards/jwt.guard';
@@ -21,6 +22,7 @@ import { TwoFACode } from './dto/twoFACode.dto';
 
 @Controller('auth/2fa')
 @UseInterceptors(ClassSerializerInterceptor)
+@ApiSecurity('access-token')
 export class DoublefaController {
   constructor(
     private readonly twoFAService: DoublefaService,
