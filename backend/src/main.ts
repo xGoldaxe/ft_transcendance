@@ -2,11 +2,10 @@ import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import conf from 'package.json';
+import { ConfigService } from '@nestjs/config';
 
-async function bootstrap() {
-  const app = await NestFactory.create(AppModule, { cors: true });
-
-  const config = new DocumentBuilder()
+function getConfigApiDoc() {
+  return new DocumentBuilder()
     .setTitle('FT_Transcendance 42')
     .setDescription(
       "L'API du backend du transcendance de tbelhomm, pleveque et ...",
@@ -33,12 +32,23 @@ async function bootstrap() {
     )
     .addServer('http://localhost:3000/', 'Serveur Local')
     .build();
-  const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document, {
-    swaggerOptions: {
-      oauth2RedirectUrl: 'http://localhost:3000/auth/login',
-    },
-  });
+}
+
+async function bootstrap() {
+  const app = await NestFactory.create(AppModule, { cors: true });
+
+  // Setup the API Documentation for env "local"
+  // Accessible on /api
+  const configService = app.get(ConfigService);
+  if (configService.get('ENV') == 'local') {
+    const config = getConfigApiDoc();
+    const document = SwaggerModule.createDocument(app, config);
+    SwaggerModule.setup('api', app, document, {
+      swaggerOptions: {
+        oauth2RedirectUrl: 'http://localhost:3000/auth/login',
+      },
+    });
+  }
 
   await app.listen(3000);
 }
