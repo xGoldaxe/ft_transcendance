@@ -13,7 +13,14 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { ApiSecurity } from '@nestjs/swagger';
+import {
+  ApiBadRequestResponse,
+  ApiForbiddenResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiSecurity,
+  ApiTags,
+} from '@nestjs/swagger';
 import { UserService } from 'src/prisma/user/user.service';
 import { AuthService } from '../auth.service';
 import { JwtAuthGuard } from '../guards/jwt.guard';
@@ -33,6 +40,16 @@ export class DoublefaController {
 
   @Post('generate')
   @UseGuards(JwtAuthGuard)
+  @ApiTags('Profil')
+  @ApiOperation({ summary: "Ajouter le 2FA au compte de l'utilisateur" })
+  @ApiForbiddenResponse({
+    description: "Le 2FA a déjà été activé par l'utilisateur",
+  })
+  @ApiOkResponse({
+    description:
+      "L'utilisateur a demandé à activer le 2FA. Il faut qu'il le valide sur /profile/2fa/enable",
+    content: { 'image/png': { schema: { type: 'string', format: 'binary' } } },
+  })
   async register(@Res() response, @Req() request) {
     if (request.user.otp_enable)
       throw new HttpException('Already Enabled', HttpStatus.FORBIDDEN);
@@ -43,6 +60,17 @@ export class DoublefaController {
   @Post('enable')
   @UseGuards(JwtAuthGuard)
   @HttpCode(200)
+  @ApiTags('Profil')
+  @ApiOperation({
+    summary: "L'utilisateur valide le 2FA qu'il a activé précédemment",
+  })
+  @ApiOkResponse({ description: "L'utilisateur a bien été mis à jour" })
+  @ApiForbiddenResponse({
+    description: "L'utilisateur n'a pas fournis le bon code",
+  })
+  @ApiBadRequestResponse({
+    description: "L'utilisateur n'a pas demandé à activer le 2FA",
+  })
   async turnOn(@Req() request, @Body() { code }: TwoFACode) {
     if (!request.user.otp_secret)
       throw new HttpException('No 2FA Code given', HttpStatus.BAD_REQUEST);
@@ -52,13 +80,17 @@ export class DoublefaController {
       request.user,
     );
     if (!isCodeValid)
-      throw new UnauthorizedException('Wrong authentication code');
+      throw new HttpException(
+        'Wrong authentication code',
+        HttpStatus.FORBIDDEN,
+      );
     await this.userService.turnOnTwoFA(request.user.id);
   }
 
   @Post('authenticate')
   @UseGuards(JwtAuthGuard)
   @HttpCode(200)
+  @ApiTags('Authentification')
   async authenticate(
     @Req() request,
     @Body() { code }: TwoFACode,
