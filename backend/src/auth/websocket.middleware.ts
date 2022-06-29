@@ -1,5 +1,6 @@
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
+import { WsException, WsResponse } from '@nestjs/websockets';
 import { User } from '@prisma/client';
 import { Socket } from 'socket.io';
 import { UserService } from 'src/prisma/user/user.service';
@@ -7,10 +8,12 @@ import { UserService } from 'src/prisma/user/user.service';
 export interface AuthSocket extends Socket {
   user: User;
 }
+
 export type SocketMiddleware = (
   socket: Socket,
-  next: (err?: Error) => void,
+  next: (err?: WsException) => void,
 ) => void;
+
 export const WSAuthMiddleware = (
   jwtService: JwtService,
   userService: UserService,
@@ -30,17 +33,10 @@ export const WSAuthMiddleware = (
         socket.user = userResult;
         next();
       } else {
-        next({
-          name: 'Access Denied',
-          message: 'Access Denied',
-        });
+        next(new WsException('Not Authenticated'));
       }
     } catch (error) {
-      console.error(error);
-      next({
-        name: 'Access Denied',
-        message: 'Access Denied',
-      });
+      next(new WsException(error));
     }
   };
 };
