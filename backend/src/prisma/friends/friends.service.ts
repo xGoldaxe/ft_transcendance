@@ -6,10 +6,34 @@ import { PrismaService } from '../prisma.service';
 export class FriendsService {
   constructor(private readonly prismaService: PrismaService) {}
 
+  async relations(user: User) {
+    return this.prismaService.friendShip.findMany({
+      where: {
+        OR: [{ requester: user }, { receiver: user }],
+      },
+      select: {
+        status: true,
+        requester: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+        receiver: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
+    });
+  }
+
   async friends(user: User) {
     return this.prismaService.friendShip.findMany({
       where: {
         OR: [{ requester: user }, { receiver: user }],
+        status: FriendShipStatus.ACCEPTED,
       },
       select: {
         status: true,

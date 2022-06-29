@@ -45,7 +45,7 @@ export class FriendsController {
     description: "Contient la liste d'ami de l'utilisateur",
   })
   async getFriends(@Req() req) {
-    return this.friends.friends(req.user);
+    return this.friends.relations(req.user);
   }
 
   @Get('/:id')

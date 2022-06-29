@@ -14,6 +14,5 @@ import { FriendsModule } from './friends/friends.module';
     FriendsModule,
   ],
   controllers: [],
-  providers: [],
 })
 export class AppModule {}

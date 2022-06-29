@@ -35,7 +35,8 @@ function getConfigApiDoc() {
 }
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, { cors: true });
+  const app = await NestFactory.create(AppModule);
+  app.enableCors();
 
   // Setup the API Documentation for env "local"
   // Accessible on /api

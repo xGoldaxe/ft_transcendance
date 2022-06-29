@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
-import { Prisma, User } from '@prisma/client';
+import { Prisma, Status, User } from '@prisma/client';
 
 @Injectable()
 export class UserService {
@@ -39,6 +39,16 @@ export class UserService {
       },
       data: {
         otp_enable: true,
+      },
+    });
+  }
+  async updateStatus(user: User, status: Status) {
+    await this.prisma.user.update({
+      where: {
+        id: user.id,
+      },
+      data: {
+        status: status,
       },
     });
   }
