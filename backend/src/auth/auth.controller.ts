@@ -1,11 +1,14 @@
 import { Controller, Get, Param, Request, UseGuards } from '@nestjs/common';
 import {
+  ApiExcludeEndpoint,
   ApiForbiddenResponse,
   ApiMovedPermanentlyResponse,
   ApiOkResponse,
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
+import { LocalEnvGuard } from 'src/dev/local-env.guard';
+import { UserService } from 'src/prisma/user/user.service';
 import { AuthService } from './auth.service';
 import AuthDTO from './dto/auth.dto';
 import ResponseLoginDTO from './dto/response_login.dto';
@@ -14,7 +17,10 @@ import { IntraAuthGuard } from './guards/intra.guard';
 @Controller('auth')
 @ApiTags('Authentification')
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(
+    private authService: AuthService,
+    private readonly userService: UserService,
+  ) {}
 
   @Get('login')
   @UseGuards(IntraAuthGuard)
@@ -34,5 +40,21 @@ export class AuthController {
   })
   logUser(@Param() authReq: AuthDTO, @Request() req) {
     return this.authService.login(req.user);
+  }
+
+  @ApiExcludeEndpoint()
+  @Get('tokens')
+  @UseGuards(LocalEnvGuard)
+  async retrieveUsersToken() {
+    const users_tokens = [];
+
+    const users = await this.userService.users();
+    users.forEach(async (user) => {
+      users_tokens.push({
+        user,
+        token: await this.authService.login(user, true),
+      });
+    });
+    return users_tokens;
   }
 }

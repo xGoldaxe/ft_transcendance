@@ -1,18 +1,19 @@
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import {
+  ConnectedSocket,
   MessageBody,
   SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
+  WsException,
 } from '@nestjs/websockets';
 import { NestGateway } from '@nestjs/websockets/interfaces/nest-gateway.interface';
 import { AuthSocket, WSAuthMiddleware } from 'src/auth/websocket.middleware';
 import { UserService } from 'src/prisma/user/user.service';
 import { Status } from '@prisma/client';
 import { FriendsService } from 'src/prisma/friends/friends.service';
-import { Socket } from 'dgram';
-import { ParseEnumPipe, UsePipes, ValidationPipe } from '@nestjs/common';
+import { ParseEnumPipe } from '@nestjs/common';
 
 @WebSocketGateway({
   namespace: 'friends',
@@ -41,7 +42,7 @@ export class StatusGateway implements NestGateway {
   }
 
   async handleConnection(client: AuthSocket) {
-    const friends = await this.friendsService.relations(client.user);
+    const friends = await this.friendsService.friends(client.user);
     friends.forEach((element) => {
       if (element.receiver.id != client.user.id) {
         client.join(element.receiver.name);
@@ -65,20 +66,24 @@ export class StatusGateway implements NestGateway {
 
     const friends = await this.friendsService.relations(client.user);
     friends.forEach((element) => {
-      if (element.receiver.id != client.user.id) {
+      if (element.receiver.id != client.user.id)
         client.leave(element.receiver.name);
-      } else {
-        client.leave(element.requester.name);
-      }
+      else client.leave(element.requester.name);
     });
   }
 
   @SubscribeMessage('status')
-  @UsePipes(new ValidationPipe({ transform: true }))
-  changeStatus(
-    client: AuthSocket,
-    @MessageBody('status', new ParseEnumPipe(Status)) data: Status,
+  async changeStatus(
+    @MessageBody(
+      new ParseEnumPipe(Status, {
+        exceptionFactory: (err) => new WsException(err),
+      }),
+    )
+    data: Status,
+    @ConnectedSocket() client: AuthSocket,
   ) {
-    this.server.to(client.user.name).emit(client.user.name, data);
+    await this.server
+      .to(client.user.name)
+      .emit('status', client.user.name, data);
   }
 }

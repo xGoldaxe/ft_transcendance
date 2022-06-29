@@ -6,6 +6,10 @@ import { Prisma, Status, User } from '@prisma/client';
 export class UserService {
   constructor(private readonly prisma: PrismaService) {}
 
+  async users(): Promise<User[] | null> {
+    return this.prisma.user.findMany();
+  }
+
   async user(
     userWhereUniqueInput: Prisma.UserWhereUniqueInput,
   ): Promise<User | null> {
