@@ -1,10 +1,20 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, OnModuleInit } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { Prisma, Status, User } from '@prisma/client';
 
 @Injectable()
-export class UserService {
+export class UserService implements OnModuleInit {
   constructor(private readonly prisma: PrismaService) {}
+
+  onModuleInit() {
+    // Dans le cas d'un crash, on remet tous les utilisateurs en offline
+    // pour éviter que leurs statuts soient altéré
+    this.prisma.user.updateMany({
+      data: {
+        status: Status.OFFLINE,
+      },
+    });
+  }
 
   async users(): Promise<User[] | null> {
     return this.prisma.user.findMany();
@@ -53,6 +63,18 @@ export class UserService {
       },
       data: {
         status: status,
+      },
+    });
+  }
+
+  async updateUser(user: User) {
+    return this.prisma.user.update({
+      where: {
+        id: user.id,
+      },
+      data: {
+        avatar: user.avatar,
+        name: user.name,
       },
     });
   }

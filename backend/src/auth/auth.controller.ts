@@ -42,9 +42,15 @@ export class AuthController {
     return this.authService.login(req.user);
   }
 
-  @ApiExcludeEndpoint()
   @Get('tokens')
   @UseGuards(LocalEnvGuard)
+  @ApiOperation({
+    summary:
+      '/!\\ Développement /!\\ only Récupérer la liste des utilisateurs avec leurs Tokens JWT',
+    description:
+      'Récupérer une liste des utilisateurs inscrits. Utilisable uniquement quand le .env possède ENV=local',
+    deprecated: true,
+  })
   async retrieveUsersToken() {
     const users_tokens = [];
 
