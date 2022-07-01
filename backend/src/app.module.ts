@@ -3,6 +3,7 @@ import { AuthModule } from './auth/auth.module';
 import { ProfileModule } from './profile/profile.module';
 import { ConfigModule } from '@nestjs/config';
 import { FriendsModule } from './friends/friends.module';
+import { MessagesModule } from './messages/messages.module';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { FriendsModule } from './friends/friends.module';
       isGlobal: true,
     }),
     FriendsModule,
+    MessagesModule,
   ],
   controllers: [],
 })

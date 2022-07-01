@@ -17,18 +17,6 @@ enum Status {
   OFFLINE
 }
 
-model User {
-  id              Int     @id @default(autoincrement())
-  name            String  @unique
-  status          Status  @default(OFFLINE)
-  avatar          String?
-  otp_secret      String?
-  otp_enable      Boolean @default(false)
-  intra_id        String  @unique
-  friendRequest   FriendShip[] @relation("friends_requests")
-  friendProposal  FriendShip[] @relation("friends_proposals")
-}
-
 enum FriendShipStatus {
   WAITING
   DENIED
@@ -36,12 +24,84 @@ enum FriendShipStatus {
   BLOCKED
 }
 
-model FriendShip {
-  requester    User @relation("friends_requests", fields: [requesterId], references: [id])
-  requesterId  Int
-  receiver     User @relation("friends_proposals", fields: [receiverId], references: [id])
-  receiverId   Int
-  status       FriendShipStatus @default(WAITING)
+enum ChannelType {
+  PRIVATE
+  PROTECTED
+  PUBLIC
+}
 
+enum ChannelUserStatus {
+  BAN
+  KICK
+  MUTE
+  USER
+  MODERATOR
+  ADMIN
+}
+
+enum ChannelMessageType {
+  MESSAGE
+  INVITE
+  SYSTEM
+}
+
+model User {
+  id             Int           @id @default(autoincrement())
+  name           String        @unique
+  status         Status        @default(OFFLINE)
+  avatar         String?
+  otp_secret     String?
+  otp_enable     Boolean       @default(false)
+  intra_id       String        @unique
+  friendRequest  FriendShip[]  @relation("friends_requests")
+  friendProposal FriendShip[]  @relation("friends_proposals")
+  channelsOwner  Channel[]     @relation("channels_owner")
+  channels       ChannelUser[] @relation("channel_user_user")
+}
+
+model FriendShip {
   @@id([requesterId, receiverId])
+
+  requesterId Int
+  receiverId  Int
+  status      FriendShipStatus @default(WAITING)
+
+  requester   User             @relation("friends_requests", fields: [requesterId], references: [id])
+  receiver    User             @relation("friends_proposals", fields: [receiverId], references: [id])
+}
+
+model Channel {
+  id      Int           @id @default(autoincrement())
+  name    String
+  ownerId Int
+
+  owner   User          @relation("channels_owner", fields: [ownerId], references: [id], onDelete: Cascade)
+  users   ChannelUser[] @relation("channel_user_channel")
+}
+
+model ChannelUser {
+  @@id([channelId, userId])
+  channelId Int
+  userId    Int
+  until     DateTime?
+
+  user      User              @relation("channel_user_user", fields: [userId], references: [id], onDelete: Cascade)
+  channel   Channel           @relation("channel_user_channel", fields: [channelId], references: [id], onDelete: Cascade)
+  state     ChannelUserStatus @default(USER)
+
+  messages ChannelMessage[]
+}
+
+model ChannelMessage {
+  id Int @id @default(autoincrement())
+
+  channelUser   ChannelUser @relation(fields: [userId, channelId], references: [channelId, userId], onDelete: Cascade)
+  userId        Int
+  channelId     Int
+  content       String
+
+  type ChannelMessageType @default(MESSAGE)
+
+  postedAt  DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
 }
