@@ -27,6 +27,9 @@ Permets de démarrer le serveur:
 npm run start:dev
 ```
 
+Pour voir la documentation de l'API:
+http://localhost:3000/api/
+
 Permets de voir le contenu de la base de donnée:
 ```
 npx prisma studio
