@@ -1,6 +1,5 @@
 import { Controller, Get, Param, Request, UseGuards } from '@nestjs/common';
 import {
-  ApiExcludeEndpoint,
   ApiForbiddenResponse,
   ApiMovedPermanentlyResponse,
   ApiOkResponse,

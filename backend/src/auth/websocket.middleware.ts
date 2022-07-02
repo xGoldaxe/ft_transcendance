@@ -1,6 +1,6 @@
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { WsException, WsResponse } from '@nestjs/websockets';
+import { WsException } from '@nestjs/websockets';
 import { User } from '@prisma/client';
 import { Socket } from 'socket.io';
 import { UserService } from 'src/prisma/user/user.service';
