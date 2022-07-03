@@ -6,6 +6,7 @@ import Header from './component/Header';
 import './main.scss'
 import ProfilBox from './component/ProfilBox';
 import { motion } from "framer-motion"
+import Profile from './component/Profile';
 
 function App() {
 	const constraintsRef = useRef(null);
@@ -22,7 +23,8 @@ function App() {
 				dragMomentum={false}
 			>
 				<ProfilBox name={'pleveque'} />
-				<Home />
+				{/* <Home /> */}
+				<Profile name={'tbelhomm'}/>
 			</motion.div>
 			<Header />
 		</div>
