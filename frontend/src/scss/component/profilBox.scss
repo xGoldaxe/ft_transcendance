@@ -1,0 +1,29 @@
+.ProfilBox {
+	width: 100%;
+	max-width: 800px;
+
+	font-size: 40px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	padding: 10px 20px;
+	border-radius: 10px;
+	cursor: pointer;
+	user-select: none;
+	&__image {
+		width: 80px;
+		height: 80px;
+		background-color: red;
+		border-radius: 50%;
+	}
+	&__name {
+		margin-block-start: 0;
+		margin-block-end: 0;
+		margin-left: 20px;
+		color: white;
+		&:hover {
+			text-decoration: underline;
+			color: blue;
+		}
+	}
+}

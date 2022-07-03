@@ -11,11 +11,18 @@ body, #root, .App {
 	display: flex;
 	flex-direction: column;
 	justify-content: space-between;
+	align-items: center;
 }
 
 .workZone {
 
 	width: 100%;
-	flex-grow: 1;
+	max-width: 800px;
 	position: relative;
+	border-right: 2px solid white;
+	border-left: 2px solid white;
+	border-radius: 5px;
+	margin: 20px 0;
+
+	flex-direction: column;
 }

@@ -3,12 +3,14 @@
 
 
 /* page */
+@import 'scss/pages/home.scss';
 
 /* component */
 @import 'scss/component/game.scss';
 @import 'scss/component/header.scss';
 @import 'scss/component/chatIcon.scss';
-
+@import 'scss/component/bigButton.scss';
+@import 'scss/component/profilBox.scss';
 
 /* utils */
 @import 'scss/utils/containers.scss';
