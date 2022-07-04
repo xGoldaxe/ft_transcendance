@@ -1,6 +1,12 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { ChannelType } from '@prisma/client';
-import { IsEnum, IsString, ValidateIf } from 'class-validator';
+import { ChannelType, ChannelUserStatus } from '@prisma/client';
+import {
+  IsDateString,
+  IsEnum,
+  IsNumber,
+  IsString,
+  ValidateIf,
+} from 'class-validator';
 
 export class ChannelDTO {
   @IsString()
@@ -11,7 +17,7 @@ export class ChannelDTO {
 
   @IsEnum(ChannelType)
   @ApiProperty({
-    example: 'PUBLIC',
+    example: ChannelType.PUBLIC,
     enum: ChannelType,
   })
   type: ChannelType;
@@ -30,6 +36,34 @@ export class ChannelPasswordDTO {
   @ApiPropertyOptional({
     required: false,
     description: 'Nécessaire si le channel est protégé',
+  })
+  password: string;
+}
+
+export class UserRoleDTO {
+  @IsNumber()
+  @ApiProperty({
+    example: 1,
+    description: "L'ID de l'utilisateur",
+    required: true,
+  })
+  userID: number;
+
+  @IsEnum(ChannelUserStatus)
+  @ApiProperty({
+    example: ChannelUserStatus.MODERATOR,
+    enum: ChannelUserStatus,
+    required: true,
+  })
+  role: ChannelUserStatus;
+
+  @IsDateString()
+  @ValidateIf(
+    (o) => o.role == ChannelUserStatus.BAN || o.role == ChannelUserStatus.MUTE,
+  )
+  @ApiPropertyOptional({
+    required: false,
+    description: 'Date à laquelle se finit la punission',
   })
   password: string;
 }

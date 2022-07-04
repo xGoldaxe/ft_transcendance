@@ -2,13 +2,17 @@ import {
   Body,
   Controller,
   Delete,
+  ForbiddenException,
   Get,
   HttpException,
   HttpStatus,
+  NotFoundException,
   Param,
   ParseIntPipe,
   Post,
+  Put,
   Req,
+  UnauthorizedException,
   UseGuards,
   UseInterceptors,
   UsePipes,
@@ -29,7 +33,7 @@ import { verify } from 'argon2';
 import Jwt2FAGuard from 'src/auth/guards/jwt-2fa.guard';
 import { ChannelsService } from 'src/prisma/channels/channels.service';
 import { ChannelPasswordInterceptor } from './interceptors/channelPassword.interceptor';
-import { ChannelDTO, ChannelPasswordDTO } from './dto/channel.dto';
+import { ChannelDTO, ChannelPasswordDTO, UserRoleDTO } from './dto/channel.dto';
 
 @Controller('channels')
 @ApiTags('Messages')
@@ -102,6 +106,8 @@ export class MessagesController {
     @Body() password_ch: ChannelPasswordDTO,
   ) {
     const channel = await this.channelService.channel(id);
+    if (!channel)
+      throw new HttpException('Channel not found', HttpStatus.NOT_FOUND);
     const isUserInChannel = channel.users.filter(
       (u) => u.user.id == req.user.id,
     );
@@ -115,6 +121,7 @@ export class MessagesController {
               'User was banned from this channel.',
               HttpStatus.UNAUTHORIZED,
             );
+          else await this.channelService.removeUser(channel, req.user);
           break;
 
         case ChannelUserStatus.INVITE:
@@ -161,12 +168,20 @@ export class MessagesController {
   @ApiOperation({
     summary: 'Quitter un channel',
   })
-  @ApiOkResponse()
+  @ApiOkResponse({
+    description: "L'utilisateur a quitté le channel",
+  })
+  @ApiForbiddenResponse({
+    description:
+      "L'utilisateur est l'owner du channel, il doit supprimer le channel pour le quitter.",
+  })
   @ApiNotFoundResponse({
     description: "L'utilisateur n'est pas dans le channel",
   })
   async leaveChannel(@Req() req, @Param('id', ParseIntPipe) id: number) {
     const channel = await this.channelService.channelUser(id, req.user);
+    if (!channel)
+      throw new HttpException('Channel not found', HttpStatus.NOT_FOUND);
     if (channel.users.length < 1)
       throw new HttpException('User not in the channel', HttpStatus.NOT_FOUND);
 
@@ -187,5 +202,84 @@ export class MessagesController {
     else await this.channelService.removeUser(channel, req.user);
 
     return 'ok';
+  }
+
+  @Put('/:id/role')
+  @UseGuards(Jwt2FAGuard)
+  @UsePipes(
+    new ValidationPipe({
+      transform: true,
+    }),
+  )
+  @ApiParam({
+    name: 'id',
+    type: 'number',
+    required: true,
+    description: 'ID du channel',
+  })
+  @ApiParam({
+    name: 'id',
+    type: 'number',
+    required: true,
+    description: 'ID du channel',
+  })
+  @ApiOperation({
+    summary: 'Quitter un channel',
+  })
+  @ApiOkResponse({
+    description: "L'utilisateur a quitté le channel",
+  })
+  async setUserRole(
+    @Req() req,
+    @Param('id', ParseIntPipe) id: number,
+    @Body() userForm: UserRoleDTO,
+  ) {
+    const channel = await this.channelService.channel(id);
+    if (!channel)
+      throw new HttpException('Channel not found', HttpStatus.NOT_FOUND);
+
+    const chanReqUsers = channel.users.filter((u) => u.userId == req.user.id);
+    const chanTargetUsers = channel.users.filter(
+      (u) => u.userId == userForm.userID,
+    );
+
+    if (chanReqUsers.length != 1) throw new UnauthorizedException();
+    if (chanTargetUsers.length != 1) throw new NotFoundException();
+    const chanReqUser = chanReqUsers[0];
+    const chanTargetUser = chanTargetUsers[0];
+
+    if (chanTargetUser.state == ChannelUserStatus.INVITE)
+      throw new ForbiddenException();
+
+    const gradePermissions = {};
+    gradePermissions[ChannelUserStatus.MODERATOR] = [
+      ChannelUserStatus.KICK,
+      ChannelUserStatus.INVITE,
+      ChannelUserStatus.MUTE,
+      ChannelUserStatus.USER,
+    ];
+    gradePermissions[ChannelUserStatus.ADMIN] = [
+      ChannelUserStatus.BAN,
+      ChannelUserStatus.KICK,
+      ChannelUserStatus.MUTE,
+      ChannelUserStatus.USER,
+      ChannelUserStatus.INVITE,
+      ChannelUserStatus.MODERATOR,
+    ];
+
+    if (chanReqUser.state in gradePermissions) {
+      const userPermissions = gradePermissions[chanReqUser.state];
+      if (
+        userForm.role in userPermissions &&
+        chanTargetUser.state in userPermissions
+      ) {
+        this.channelService.updateUser(
+          channel,
+          chanTargetUser.user,
+          userForm.role,
+        );
+      }
+    }
+    throw new ForbiddenException();
   }
 }

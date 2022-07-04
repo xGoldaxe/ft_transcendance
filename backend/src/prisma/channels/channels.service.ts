@@ -132,7 +132,12 @@ export class ChannelsService {
     });
   }
 
-  async updateUser(channel: Channel, user: User, state: ChannelUserStatus) {
+  async updateUser(
+    channel: Channel,
+    user: User,
+    state: ChannelUserStatus,
+    endDate?: Date,
+  ) {
     return this.prisma.channel.update({
       where: {
         id: channel.id,
@@ -146,6 +151,7 @@ export class ChannelsService {
             },
             data: {
               state,
+              until: endDate,
             },
           },
         },
