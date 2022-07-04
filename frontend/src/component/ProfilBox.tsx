@@ -1,7 +1,8 @@
+import { useNavigate } from 'react-router-dom';
 import useContextMenu from '../lib/generateMenu';
 
-export default function ProfilBox({ name }: { name: string }) {
-	
+export function NameWithMenu({ name }: { name: string }) {
+
 	const generateMenu = useContextMenu([
 		{
 			name: 'View profile',
@@ -22,14 +23,27 @@ export default function ProfilBox({ name }: { name: string }) {
 			}
 		}
 	])
+	let navigate = useNavigate();
 
+	return (
+		<span
+		className={'NameWithMenu'}
+		onContextMenu={(e)=>generateMenu(e)}
+		onClick={()=>{navigate(`/profile?name=${name}`)}}
+		>
+			{name}
+		</span>
+	)
+}
+
+export default function ProfilBox({ name }: { name: string }) {
+	
 	return (
 		<div className='ProfilBox'>
 			<div className='ProfilBox__image'></div>
-			<p 
-			className='ProfilBox__name'
-			onContextMenu={(e)=>generateMenu(e)}
-			>{name}</p>
+			<p className={'ProfilBox__name'}>
+				<NameWithMenu name={name}/>
+			</p>
 		</div>
 	)
 }

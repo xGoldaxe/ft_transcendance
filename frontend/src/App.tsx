@@ -6,28 +6,34 @@ import Header from './component/Header';
 import './main.scss'
 import ProfilBox from './component/ProfilBox';
 import { motion } from "framer-motion"
-import Profile from './component/Profile';
+import Profile from './pages/Profile';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
 function App() {
 	const constraintsRef = useRef(null);
 
 	return (
-		<div className="App" ref={constraintsRef}>
-			<ChatIcon constraintsRef={constraintsRef}/>
-			<Header />
-			<motion.div
-				className="workZone flexContainer"
-				drag
-				dragSnapToOrigin={true}
-				dragConstraints={constraintsRef}
-				dragMomentum={false}
-			>
-				<ProfilBox name={'pleveque'} />
-				{/* <Home /> */}
-				<Profile name={'tbelhomm'}/>
-			</motion.div>
-			<Header />
-		</div>
+		<BrowserRouter>
+			<div className="App">
+				<Header />
+				<div className='workZone' ref={constraintsRef}>
+					<ChatIcon constraintsRef={constraintsRef}/>
+					<motion.div
+						className="workZone__page flexContainer"
+						drag
+						dragSnapToOrigin={true}
+						dragConstraints={constraintsRef}
+						dragMomentum={false}
+					>
+							<Routes>
+								<Route path="/" element={<Home />} />
+								<Route path='profile' element={<Profile />} />
+							</Routes>
+					</motion.div>
+				</div>
+				<Header />
+			</div>
+		</BrowserRouter>
 	);
 }
 

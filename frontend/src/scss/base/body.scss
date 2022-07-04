@@ -4,7 +4,7 @@ body, #root, .App {
 	background-color:  black;
 	width: 100vw;
 	height: 100vh;
-	font-family: PixelBit;
+	font-family: 'Courier New', Courier, monospace;
 }
 
 .App {
@@ -15,16 +15,20 @@ body, #root, .App {
 }
 
 .workZone {
-
 	width: 100%;
-	max-width: 800px;
 	position: relative;
-	border-right: 2px solid white;
-	border-left: 2px solid white;
-	border-top: 2px solid white;
-	padding-top: 30px;
-	border-radius: 5px;
-	margin: 20px 0;
+	display: flex;
+	flex-grow: 1;
 
-	flex-direction: column;
+	justify-content: center;
+	&__page {
+
+		width: 100%;
+		max-width: 800px;
+
+		position: relative;
+		border-radius: 5px;
+	
+		flex-direction: column;
+	}
 }

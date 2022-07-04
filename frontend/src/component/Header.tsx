@@ -1,9 +1,15 @@
 import React from 'react'
+import { useNavigate } from 'react-router-dom';
 
 export default function Header() {
-  return (
-	<div className='header'>
-		CLASSICAL PONG
-	</div>
-  )
+
+	let navigate = useNavigate();
+	return (
+		<div 
+		onClick={()=>{navigate(`/`)}}
+		className='header'
+		>
+			CLASSICAL PONG
+		</div>
+	)
 }
