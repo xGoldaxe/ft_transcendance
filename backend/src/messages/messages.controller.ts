@@ -28,18 +28,22 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import { Channel, ChannelType, ChannelUserStatus } from '@prisma/client';
+import { ChannelType, ChannelUserStatus } from '@prisma/client';
 import { verify } from 'argon2';
 import Jwt2FAGuard from 'src/auth/guards/jwt-2fa.guard';
 import { ChannelsService } from 'src/prisma/channels/channels.service';
 import { ChannelPasswordInterceptor } from './interceptors/channelPassword.interceptor';
 import { ChannelDTO, ChannelPasswordDTO, UserRoleDTO } from './dto/channel.dto';
+import { MessagesService } from './messages.service';
 
 @Controller('channels')
 @ApiTags('Messages')
 @ApiSecurity('access-token')
 export class MessagesController {
-  constructor(private readonly channelService: ChannelsService) {}
+  constructor(
+    private readonly channelService: ChannelsService,
+    private readonly messageService: MessagesService,
+  ) {}
 
   @Get('/')
   @UseGuards(Jwt2FAGuard)
@@ -217,17 +221,17 @@ export class MessagesController {
     required: true,
     description: 'ID du channel',
   })
-  @ApiParam({
-    name: 'id',
-    type: 'number',
-    required: true,
-    description: 'ID du channel',
-  })
   @ApiOperation({
-    summary: 'Quitter un channel',
+    summary: "Changer le rôle d'un utilisateur",
+  })
+  @ApiNotFoundResponse({
+    description: 'Le channel est introuvable',
   })
   @ApiOkResponse({
-    description: "L'utilisateur a quitté le channel",
+    description: "L'utilisateur a été changé de rôle",
+  })
+  @ApiForbiddenResponse({
+    description: "L'utilisateur n'a pas la permission de faire ça",
   })
   async setUserRole(
     @Req() req,
@@ -235,8 +239,7 @@ export class MessagesController {
     @Body() userForm: UserRoleDTO,
   ) {
     const channel = await this.channelService.channel(id);
-    if (!channel)
-      throw new HttpException('Channel not found', HttpStatus.NOT_FOUND);
+    if (!channel) throw new NotFoundException();
 
     const chanReqUsers = channel.users.filter((u) => u.userId == req.user.id);
     const chanTargetUsers = channel.users.filter(
@@ -251,34 +254,20 @@ export class MessagesController {
     if (chanTargetUser.state == ChannelUserStatus.INVITE)
       throw new ForbiddenException();
 
-    const gradePermissions = {};
-    gradePermissions[ChannelUserStatus.MODERATOR] = [
-      ChannelUserStatus.KICK,
-      ChannelUserStatus.INVITE,
-      ChannelUserStatus.MUTE,
-      ChannelUserStatus.USER,
-    ];
-    gradePermissions[ChannelUserStatus.ADMIN] = [
-      ChannelUserStatus.BAN,
-      ChannelUserStatus.KICK,
-      ChannelUserStatus.MUTE,
-      ChannelUserStatus.USER,
-      ChannelUserStatus.INVITE,
-      ChannelUserStatus.MODERATOR,
-    ];
-
-    if (chanReqUser.state in gradePermissions) {
-      const userPermissions = gradePermissions[chanReqUser.state];
-      if (
-        userForm.role in userPermissions &&
-        chanTargetUser.state in userPermissions
-      ) {
-        this.channelService.updateUser(
-          channel,
-          chanTargetUser.user,
-          userForm.role,
-        );
-      }
+    if (
+      this.messageService.hasUserPermission(
+        channel,
+        chanReqUser,
+        chanTargetUser,
+        userForm.role,
+      )
+    ) {
+      await this.channelService.updateUser(
+        channel,
+        chanTargetUser.user,
+        userForm.role,
+      );
+      return 'ok';
     }
     throw new ForbiddenException();
   }

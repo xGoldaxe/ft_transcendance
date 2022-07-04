@@ -4,9 +4,10 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { UserService } from 'src/prisma/user/user.service';
 import { ChannelsGateway } from './channels.gateway';
 import { MessagesController } from './messages.controller';
+import { MessagesService } from './messages.service';
 
 @Module({
-  providers: [ChannelsGateway, PrismaService, UserService, ChannelsService],
+  providers: [ChannelsGateway, PrismaService, UserService, ChannelsService, MessagesService],
   controllers: [MessagesController],
 })
 export class MessagesModule {}

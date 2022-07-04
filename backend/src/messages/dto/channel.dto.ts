@@ -65,5 +65,5 @@ export class UserRoleDTO {
     required: false,
     description: 'Date à laquelle se finit la punission',
   })
-  password: string;
+  until: string;
 }
