@@ -60,45 +60,47 @@ model User {
 }
 
 model FriendShip {
-  @@id([requesterId, receiverId])
 
   requesterId Int
   receiverId  Int
   status      FriendShipStatus @default(WAITING)
 
-  requester   User             @relation("friends_requests", fields: [requesterId], references: [id])
-  receiver    User             @relation("friends_proposals", fields: [receiverId], references: [id])
+  requester User @relation("friends_requests", fields: [requesterId], references: [id])
+  receiver  User @relation("friends_proposals", fields: [receiverId], references: [id])
+  @@id([requesterId, receiverId])
 }
 
 model Channel {
-  id      Int           @id @default(autoincrement())
-  name    String
-  ownerId Int
+  id       Int         @id @default(autoincrement())
+  type     ChannelType
+  name     String
+  ownerId  Int
+  password String?
 
-  owner   User          @relation("channels_owner", fields: [ownerId], references: [id], onDelete: Cascade)
-  users   ChannelUser[] @relation("channel_user_channel")
+  owner User          @relation("channels_owner", fields: [ownerId], references: [id], onDelete: Cascade)
+  users ChannelUser[] @relation("channel_user_channel")
 }
 
 model ChannelUser {
-  @@id([channelId, userId])
   channelId Int
   userId    Int
   until     DateTime?
 
-  user      User              @relation("channel_user_user", fields: [userId], references: [id], onDelete: Cascade)
-  channel   Channel           @relation("channel_user_channel", fields: [channelId], references: [id], onDelete: Cascade)
-  state     ChannelUserStatus @default(USER)
+  user    User              @relation("channel_user_user", fields: [userId], references: [id], onDelete: Cascade)
+  channel Channel           @relation("channel_user_channel", fields: [channelId], references: [id], onDelete: Cascade)
+  state   ChannelUserStatus @default(USER)
 
   messages ChannelMessage[]
+  @@id([channelId, userId])
 }
 
 model ChannelMessage {
   id Int @id @default(autoincrement())
 
-  channelUser   ChannelUser @relation(fields: [userId, channelId], references: [channelId, userId], onDelete: Cascade)
-  userId        Int
-  channelId     Int
-  content       String
+  channelUser ChannelUser @relation(fields: [userId, channelId], references: [channelId, userId], onDelete: Cascade)
+  userId      Int
+  channelId   Int
+  content     String
 
   type ChannelMessageType @default(MESSAGE)
 

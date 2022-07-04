@@ -78,4 +78,29 @@ export class UserService implements OnModuleInit {
       },
     });
   }
+
+  async usersChannels(user: User) {
+    return this.prisma.channel.findMany({
+      where: {
+        users: {
+          some: {
+            userId: user.id,
+          },
+        },
+      },
+      include: {
+        users: {
+          include: {
+            user: {
+              select: {
+                name: true,
+                avatar: true,
+                id: true,
+              },
+            },
+          },
+        },
+      },
+    });
+  }
 }
