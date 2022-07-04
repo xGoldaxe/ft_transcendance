@@ -1,5 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { Channel, ChannelType, ChannelUserStatus, User } from '@prisma/client';
+import {
+  Channel,
+  ChannelType,
+  ChannelUserStatus,
+  Prisma,
+  User,
+} from '@prisma/client';
 import { hash } from 'argon2';
 import { PrismaService } from '../prisma.service';
 
@@ -134,7 +140,7 @@ export class ChannelsService {
 
   async updateUser(
     channel: Channel,
-    user: User,
+    user: Prisma.ChannelWhereUniqueInput,
     state: ChannelUserStatus,
     endDate?: Date,
   ) {
