@@ -1,12 +1,11 @@
 .chatIcon {
 
 	position: absolute;
-	border-radius: 50%;
-	width: 80px;
-	height: 80px;
-	background-color: green;
+	width: 140px;
+	height: 140px;
 	left: 5px;
 	top: 5px;
 	cursor: pointer;
+	user-select: none;
 	z-index: 999;
 }
