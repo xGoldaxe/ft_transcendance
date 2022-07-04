@@ -11,7 +11,9 @@ export interface Response<T> {
 }
 
 @Injectable()
-export class ChannelInterceptor<T> implements NestInterceptor<T, Response<T>> {
+export class ChannelPasswordInterceptor<T>
+  implements NestInterceptor<T, Response<T>>
+{
   intercept(
     context: ExecutionContext,
     next: CallHandler,

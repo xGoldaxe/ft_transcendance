@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpException,
   HttpStatus,
@@ -15,6 +16,7 @@ import {
 } from '@nestjs/common';
 import {
   ApiForbiddenResponse,
+  ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
   ApiParam,
@@ -26,7 +28,7 @@ import { Channel, ChannelType, ChannelUserStatus } from '@prisma/client';
 import { verify } from 'argon2';
 import Jwt2FAGuard from 'src/auth/guards/jwt-2fa.guard';
 import { ChannelsService } from 'src/prisma/channels/channels.service';
-import { ChannelInterceptor } from './channel.interceptor';
+import { ChannelPasswordInterceptor } from './interceptors/channelPassword.interceptor';
 import { ChannelDTO, ChannelPasswordDTO } from './dto/channel.dto';
 
 @Controller('channels')
@@ -57,7 +59,7 @@ export class MessagesController {
       transform: true,
     }),
   )
-  @UseInterceptors(ChannelInterceptor)
+  @UseInterceptors(ChannelPasswordInterceptor)
   async createChannel(@Req() req, @Body() channel: ChannelDTO) {
     return await this.channelService.create(
       channel.name,
@@ -74,7 +76,7 @@ export class MessagesController {
       transform: true,
     }),
   )
-  @UseInterceptors(ChannelInterceptor)
+  @UseInterceptors(ChannelPasswordInterceptor)
   @ApiOperation({
     summary: 'Rejoindre un channel',
   })
@@ -141,5 +143,49 @@ export class MessagesController {
 
     await this.channelService.addUser(channel, req.user);
     return await this.channelService.channel(id);
+  }
+
+  @Delete('/:id/leave')
+  @UseGuards(Jwt2FAGuard)
+  @UsePipes(
+    new ValidationPipe({
+      transform: true,
+    }),
+  )
+  @ApiParam({
+    name: 'id',
+    type: 'number',
+    required: true,
+    description: 'ID du channel à quitter',
+  })
+  @ApiOperation({
+    summary: 'Quitter un channel',
+  })
+  @ApiOkResponse()
+  @ApiNotFoundResponse({
+    description: "L'utilisateur n'est pas dans le channel",
+  })
+  async leaveChannel(@Req() req, @Param('id', ParseIntPipe) id: number) {
+    const channel = await this.channelService.channelUser(id, req.user);
+    if (channel.users.length < 1)
+      throw new HttpException('User not in the channel', HttpStatus.NOT_FOUND);
+
+    const userChannel = channel.users[0];
+
+    if (channel.ownerId == req.user.id)
+      throw new HttpException(
+        'User is the owner of the channel',
+        HttpStatus.UNAUTHORIZED,
+      );
+
+    if (userChannel.state == ChannelUserStatus.MUTE)
+      await this.channelService.updateUser(
+        channel,
+        req.user,
+        ChannelUserStatus.BAN,
+      );
+    else await this.channelService.removeUser(channel, req.user);
+
+    return 'ok';
   }
 }

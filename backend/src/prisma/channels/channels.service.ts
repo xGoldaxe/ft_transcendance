@@ -90,6 +90,30 @@ export class ChannelsService {
     });
   }
 
+  async channelUser(id: number, user: User) {
+    return this.prisma.channel.findUnique({
+      where: {
+        id,
+      },
+      include: {
+        users: {
+          where: {
+            userId: user.id,
+          },
+          include: {
+            user: {
+              select: {
+                name: true,
+                avatar: true,
+                id: true,
+              },
+            },
+          },
+        },
+      },
+    });
+  }
+
   async addUser(channel: Channel, user: User) {
     return this.prisma.channel.update({
       where: {
@@ -124,6 +148,24 @@ export class ChannelsService {
               state,
             },
           },
+        },
+      },
+    });
+  }
+
+  async removeUser(channel: Channel, user: User) {
+    return this.prisma.channel.update({
+      where: {
+        id: channel.id,
+      },
+      data: {
+        users: {
+          deleteMany: [
+            {
+              userId: user.id,
+              channelId: channel.id,
+            },
+          ],
         },
       },
     });
