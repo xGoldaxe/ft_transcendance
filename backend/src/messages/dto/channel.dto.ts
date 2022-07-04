@@ -24,3 +24,12 @@ export class ChannelDTO {
   })
   password: string;
 }
+
+export class ChannelPasswordDTO {
+  @IsString()
+  @ApiPropertyOptional({
+    required: false,
+    description: 'Nécessaire si le channel est protégé',
+  })
+  password: string;
+}

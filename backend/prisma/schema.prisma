@@ -34,6 +34,7 @@ enum ChannelUserStatus {
   BAN
   KICK
   MUTE
+  INVITE
   USER
   MODERATOR
   ADMIN
