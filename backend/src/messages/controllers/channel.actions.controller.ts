@@ -191,9 +191,9 @@ export class ChannelActionController {
     const channel = await this.channelService.channel(id);
     if (!channel) throw new NotFoundException();
 
-    const chanReqUsers = channel.users.filter((u) => u.userId == req.user.id);
+    const chanReqUsers = channel.users.filter((u) => u.user.id == req.user.id);
     const chanTargetUsers = channel.users.filter(
-      (u) => u.userId == userForm.userID,
+      (u) => u.user.id == userForm.userID,
     );
 
     if (chanReqUsers.length != 1) throw new UnauthorizedException();

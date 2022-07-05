@@ -47,17 +47,18 @@ enum ChannelMessageType {
 }
 
 model User {
-  id             Int           @id @default(autoincrement())
-  name           String        @unique
-  status         Status        @default(OFFLINE)
+  id             Int              @id @default(autoincrement())
+  name           String           @unique
+  status         Status           @default(OFFLINE)
   avatar         String?
   otp_secret     String?
-  otp_enable     Boolean       @default(false)
-  intra_id       String        @unique
-  friendRequest  FriendShip[]  @relation("friends_requests")
-  friendProposal FriendShip[]  @relation("friends_proposals")
-  channelsOwner  Channel[]     @relation("channels_owner")
-  channels       ChannelUser[] @relation("channel_user_user")
+  otp_enable     Boolean          @default(false)
+  intra_id       String           @unique
+  friendRequest  FriendShip[]     @relation("friends_requests")
+  friendProposal FriendShip[]     @relation("friends_proposals")
+  channelsOwner  Channel[]        @relation("channels_owner")
+  channels       ChannelUser[]    @relation("channel_user_user")
+  ChannelMessage ChannelMessage[]
 }
 
 model FriendShip {
@@ -78,8 +79,9 @@ model Channel {
   ownerId  Int
   password String?
 
-  owner User          @relation("channels_owner", fields: [ownerId], references: [id], onDelete: Cascade)
-  users ChannelUser[] @relation("channel_user_channel")
+  owner    User             @relation("channels_owner", fields: [ownerId], references: [id], onDelete: Cascade)
+  users    ChannelUser[]    @relation("channel_user_channel")
+  messages ChannelMessage[]
 }
 
 model ChannelUser {
@@ -98,13 +100,18 @@ model ChannelUser {
 model ChannelMessage {
   id Int @id @default(autoincrement())
 
-  channelUser ChannelUser @relation(fields: [userId, channelId], references: [channelId, userId], onDelete: Cascade)
-  userId      Int
-  channelId   Int
-  content     String
+  userId    Int
+  channelId Int
+  content   String
+
+  User    User    @relation(fields: [userId], references: [id])
+  Channel Channel @relation(fields: [channelId], references: [id])
 
   type ChannelMessageType @default(MESSAGE)
 
-  postedAt  DateTime @default(now())
-  updatedAt DateTime @default(now()) @updatedAt
+  postedAt             DateTime     @default(now())
+  updatedAt            DateTime     @default(now()) @updatedAt
+  ChannelUser          ChannelUser? @relation(fields: [channelUserChannelId, channelUserUserId], references: [channelId, userId])
+  channelUserChannelId Int?
+  channelUserUserId    Int?
 }

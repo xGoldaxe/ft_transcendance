@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import {
   Channel,
+  ChannelMessageType,
   ChannelType,
   ChannelUserStatus,
   Prisma,
@@ -75,7 +76,7 @@ export class ChannelsService {
     });
   }
 
-  async channel(id: number) {
+  async channel(id: number, start = 0, take = 1) {
     return this.prisma.channel.findUnique({
       where: {
         id,
@@ -92,6 +93,63 @@ export class ChannelsService {
             },
           },
         },
+        messages: {
+          orderBy: {
+            id: 'desc',
+          },
+          take,
+          skip: start,
+          include: {
+            User: {
+              select: {
+                id: true,
+                name: true,
+                avatar: true,
+              },
+            },
+          },
+        },
+      },
+    });
+  }
+
+  async isUserInChannel(channel_id: number, user: User) {
+    const users = await this.prisma.channelUser.findFirst({
+      where: {
+        channelId: channel_id,
+        userId: user.id,
+        OR: [
+          { state: ChannelUserStatus.USER },
+          { state: ChannelUserStatus.MODERATOR },
+          { state: ChannelUserStatus.ADMIN },
+          { state: ChannelUserStatus.MUTE },
+        ],
+      },
+      select: {
+        state: true,
+      },
+    });
+
+    if (!users) return false;
+
+    if (users.state == ChannelUserStatus.MUTE)
+      return {
+        muted: true,
+      };
+    return {
+      muted: false,
+    };
+  }
+
+  async addMessage(channel_id: number, user: User, message: string) {
+    return this.prisma.channelMessage.create({
+      data: {
+        content: message,
+        channelId: channel_id,
+        userId: user.id,
+        channelUserUserId: user.id,
+        channelUserChannelId: channel_id,
+        type: ChannelMessageType.MESSAGE,
       },
     });
   }

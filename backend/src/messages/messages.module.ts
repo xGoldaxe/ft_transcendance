@@ -6,6 +6,7 @@ import { ChannelsGateway } from './channels.gateway';
 import { ChannelCrudController } from './controllers/channel.crud.controller';
 import { ChannelActionController } from './controllers/channel.actions.controller';
 import { MessagesService } from './messages.service';
+import { JwtService } from '@nestjs/jwt';
 
 @Module({
   providers: [
@@ -14,6 +15,7 @@ import { MessagesService } from './messages.service';
     UserService,
     ChannelsService,
     MessagesService,
+    JwtService,
   ],
   controllers: [ChannelCrudController, ChannelActionController],
 })

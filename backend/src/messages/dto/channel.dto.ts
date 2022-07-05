@@ -1,3 +1,4 @@
+import { DefaultValuePipe } from '@nestjs/common';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { ChannelType, ChannelUserStatus } from '@prisma/client';
 import {
@@ -66,4 +67,26 @@ export class UserRoleDTO {
     description: 'Date à laquelle se finit la punission',
   })
   until: string;
+}
+
+export class ChannelMessageDTO {
+  @IsNumber()
+  @ApiPropertyOptional({
+    description: 'Message à partir duquel il faut commencer la sélection',
+    type: 'int32',
+    examples: [0, 10, 20, 50, 100],
+    default: 0,
+    minimum: 0,
+  })
+  start = 0;
+
+  @IsNumber()
+  @ApiPropertyOptional({
+    description: 'Nombre de messages à prendre',
+    type: 'int32',
+    examples: [1, 10, 100],
+    minimum: 1,
+    maximum: 100,
+  })
+  count = 100;
 }
