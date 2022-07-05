@@ -36,12 +36,12 @@ export function NameWithMenu({ name }: { name: string }) {
 	)
 }
 
-export default function ProfilBox({ name }: { name: string }) {
-	
+export default function ProfilBox({ name, cName='ProfilBox', precClass='' }:
+{ name: string, cName?: string, precClass?: string }) {
 	return (
-		<div className='ProfilBox'>
-			<div className='ProfilBox__image'></div>
-			<p className={'ProfilBox__name'}>
+		<div className={`${cName} ${precClass}`}>
+			<div className={`${cName}__image`}></div>
+			<p className={`${cName}__name`}>
 				<NameWithMenu name={name}/>
 			</p>
 		</div>

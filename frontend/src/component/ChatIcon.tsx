@@ -1,13 +1,19 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { motion } from "framer-motion"
 import Logo from '../images/talk.svg'
 import Modal, { useModal } from './Modal'
+import ModalBox from './ModalBox';
+import Chat from '../pages/Chat';
 
 export default function ChatIcon({ constraintsRef } :
 { constraintsRef: React.MutableRefObject<null> }) {
 
-	const [draggin, setDraggin] = useState<boolean>(false);
-	var { modal, setOpen } = useModal(<p>Hey</p>);
+	// const [draggin, setDraggin] = useState<boolean>(false);
+	var { modal, setOpen } = useModal(<Chat />);
+	useEffect(() => {
+		setOpen(true);
+	}, [])
+	
 
 	// var tap = () => {
 	// 	var drag = draggin;
@@ -34,7 +40,7 @@ export default function ChatIcon({ constraintsRef } :
 			src={Logo} alt='logo'
 
 			// onDragStart={drag}
-			onDoubleClick={()=>{setOpen(true)}}
+			onClick={()=>{setOpen(true)}}
 			// onTap={tap()}
 			// onTapCancel={tap()}
 			>

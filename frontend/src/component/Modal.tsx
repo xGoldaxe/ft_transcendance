@@ -35,7 +35,7 @@ export default function Modal({ children, open, setOpen }:
 				></div>
 				<div className="Modal__content" style={{
 					position: 'absolute',
-					zIndex: 2
+					zIndex: 2,
 				}}>{children}</div>
 			</div>
 			: <></>
