@@ -4,15 +4,18 @@ import Logo from '../images/talk.svg'
 import Modal, { useModal } from './Modal'
 import ModalBox from './ModalBox';
 import Chat from '../pages/Chat';
+import { useLocation } from 'react-router-dom'
 
 export default function ChatIcon({ constraintsRef } :
 { constraintsRef: React.MutableRefObject<null> }) {
 
 	// const [draggin, setDraggin] = useState<boolean>(false);
 	var { modal, setOpen } = useModal(<Chat />);
+	let location = useLocation();
+
 	useEffect(() => {
-		setOpen(true);
-	}, [])
+		setOpen(false);
+	}, [location]);
 	
 
 	// var tap = () => {

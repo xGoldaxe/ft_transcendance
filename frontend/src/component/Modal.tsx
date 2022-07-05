@@ -22,7 +22,7 @@ export default function Modal({ children, open, setOpen }:
 				height: '100vh',
 				position: 'absolute',
 				top: 0,
-				zIndex: 99999
+				zIndex: 1000
 			}}>
 				<div className="Modal__bg" style={{
 					width: '100vw',
