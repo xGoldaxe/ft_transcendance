@@ -1,9 +1,12 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { ChannelUser, ChannelUserStatus } from '@prisma/client';
 import { Channel } from '@prisma/client';
+import { ChannelsService } from 'src/prisma/channels/channels.service';
 
 @Injectable()
 export class MessagesService {
+  constructor(private readonly channelDB: ChannelsService) {}
+
   hasUserPermission(
     channel: Channel,
     source: ChannelUser,

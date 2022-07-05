@@ -3,7 +3,6 @@ import {
   Controller,
   Delete,
   ForbiddenException,
-  Get,
   HttpException,
   HttpStatus,
   NotFoundException,
@@ -32,58 +31,21 @@ import { ChannelType, ChannelUserStatus } from '@prisma/client';
 import { verify } from 'argon2';
 import Jwt2FAGuard from 'src/auth/guards/jwt-2fa.guard';
 import { ChannelsService } from 'src/prisma/channels/channels.service';
-import { ChannelPasswordInterceptor } from './interceptors/channelPassword.interceptor';
-import { ChannelDTO, ChannelPasswordDTO, UserRoleDTO } from './dto/channel.dto';
-import { MessagesService } from './messages.service';
+import { ChannelPasswordInterceptor } from '../interceptors/channelPassword.interceptor';
+import { ChannelPasswordDTO, UserRoleDTO } from '../dto/channel.dto';
+import { MessagesService } from '../messages.service';
 
 @Controller('channels')
+@UseGuards(Jwt2FAGuard)
 @ApiTags('Messages')
 @ApiSecurity('access-token')
-export class MessagesController {
+export class ChannelActionController {
   constructor(
     private readonly channelService: ChannelsService,
     private readonly messageService: MessagesService,
   ) {}
 
-  @Get('/')
-  @UseGuards(Jwt2FAGuard)
-  @ApiOperation({
-    summary: "Récupérer tous les channels dont l'utilisateur fait parti",
-  })
-  @ApiOkResponse({
-    description: 'Liste de tous les channels dont il fait parti',
-  })
-  async channels(@Req() req) {
-    return await this.channelService.channelsForUser(req.user);
-  }
-
-  @Post('/')
-  @UseGuards(Jwt2FAGuard)
-  @ApiOperation({
-    summary: 'Créer un channel',
-  })
-  @UsePipes(
-    new ValidationPipe({
-      transform: true,
-    }),
-  )
-  @UseInterceptors(ChannelPasswordInterceptor)
-  async createChannel(@Req() req, @Body() channel: ChannelDTO) {
-    return await this.channelService.create(
-      channel.name,
-      channel.type,
-      channel.password,
-      req.user,
-    );
-  }
-
   @Post('/:id/join')
-  @UseGuards(Jwt2FAGuard)
-  @UsePipes(
-    new ValidationPipe({
-      transform: true,
-    }),
-  )
   @UseInterceptors(ChannelPasswordInterceptor)
   @ApiOperation({
     summary: 'Rejoindre un channel',
@@ -157,12 +119,6 @@ export class MessagesController {
   }
 
   @Delete('/:id/leave')
-  @UseGuards(Jwt2FAGuard)
-  @UsePipes(
-    new ValidationPipe({
-      transform: true,
-    }),
-  )
   @ApiParam({
     name: 'id',
     type: 'number',
@@ -209,12 +165,6 @@ export class MessagesController {
   }
 
   @Put('/:id/role')
-  @UseGuards(Jwt2FAGuard)
-  @UsePipes(
-    new ValidationPipe({
-      transform: true,
-    }),
-  )
   @ApiParam({
     name: 'id',
     type: 'number',

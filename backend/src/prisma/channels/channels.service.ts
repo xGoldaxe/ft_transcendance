@@ -182,4 +182,12 @@ export class ChannelsService {
       },
     });
   }
+
+  async delete(channel: Channel) {
+    return this.prisma.channel.delete({
+      where: {
+        id: channel.id,
+      },
+    });
+  }
 }

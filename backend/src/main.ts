@@ -3,6 +3,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import conf from 'package.json';
 import { ConfigService } from '@nestjs/config';
+import { ValidationPipe } from '@nestjs/common';
 
 function getConfigApiDoc() {
   return new DocumentBuilder()
@@ -37,6 +38,11 @@ function getConfigApiDoc() {
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.enableCors();
+  app.useGlobalPipes(
+    new ValidationPipe({
+      transform: true,
+    }),
+  );
 
   // Setup the API Documentation for env "local"
   // Accessible on /api
