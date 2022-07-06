@@ -1,9 +1,11 @@
 import {
+  BadRequestException,
   Controller,
   Delete,
   Get,
   HttpException,
   HttpStatus,
+  NotFoundException,
   Param,
   ParseIntPipe,
   Post,
@@ -25,6 +27,7 @@ import { FriendShipStatus } from '@prisma/client';
 import Jwt2FAGuard from 'src/auth/guards/jwt-2fa.guard';
 import { FriendsService } from 'src/prisma/friends/friends.service';
 import { UserService } from 'src/prisma/user/user.service';
+import { StatusGateway } from './status.gateway';
 
 @Controller('friends')
 @ApiSecurity('access-token')
@@ -33,6 +36,7 @@ export class FriendsController {
   constructor(
     private readonly friends: FriendsService,
     private readonly users: UserService,
+    private readonly gateway: StatusGateway,
   ) {}
 
   @Get()
@@ -77,22 +81,13 @@ export class FriendsController {
   })
   async getFriend(@Req() req, @Param('id', ParseIntPipe) id: number) {
     if (id == req.user.id)
-      throw new HttpException(
+      throw new BadRequestException(
         'Vous ne pouvez pas être amis avec vous même...',
-        HttpStatus.BAD_REQUEST,
       );
     const user = await this.users.user({ id: id });
-    if (!user)
-      throw new HttpException(
-        "L'utilisateur n'existe pas",
-        HttpStatus.NOT_FOUND,
-      );
+    if (!user) throw new NotFoundException("L'utilisateur n'existe pas");
     const status = await this.friends.relationWith(req.user, user);
-    if (!status)
-      throw new HttpException(
-        'Aucun lien avec cet utilisateur',
-        HttpStatus.NOT_FOUND,
-      );
+    if (!status) throw new NotFoundException('Aucun lien avec cet utilisateur');
     return status.status;
   }
 
@@ -178,6 +173,7 @@ export class FriendsController {
         user,
         FriendShipStatus.BLOCKED,
       );
+      await this.gateway.deleteFriend(req.user, user);
       return;
     }
     if (is_friend)
@@ -240,6 +236,7 @@ export class FriendsController {
 
       case FriendShipStatus.WAITING:
         this.friends.deleteFriendShip(req.user, user);
+        await this.gateway.deleteFriend(req.user, user);
         return;
 
       default:
@@ -284,6 +281,7 @@ export class FriendsController {
       relation.requester != req.user
     ) {
       await this.friends.acceptFriendShip(req.user, user);
+      await this.gateway.newFriend(req.user, user);
       return;
     }
 
