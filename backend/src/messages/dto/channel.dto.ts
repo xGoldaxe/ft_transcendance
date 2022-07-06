@@ -1,4 +1,3 @@
-import { DefaultValuePipe } from '@nestjs/common';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { ChannelType, ChannelUserStatus } from '@prisma/client';
 import {

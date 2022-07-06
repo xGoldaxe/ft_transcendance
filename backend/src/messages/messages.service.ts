@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { ChannelUser, ChannelUserStatus } from '@prisma/client';
 import { Channel } from '@prisma/client';
 import { ChannelsService } from 'src/prisma/channels/channels.service';

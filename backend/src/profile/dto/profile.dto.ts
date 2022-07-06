@@ -10,13 +10,10 @@ export class EditProfileDTO {
   })
   name: string;
 
-  @IsString()
   @ApiPropertyOptional({
     name: 'avatar',
-    type: 'string',
-    format: 'binary',
-    description: "Base64 d'une image au format PNG",
-    example: `iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==`,
+    description: "Nouvelle image de profile de l'utilisateur",
+    type: 'file',
   })
-  avatar: string;
+  avatar;
 }
