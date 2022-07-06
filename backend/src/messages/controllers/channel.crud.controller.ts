@@ -15,7 +15,6 @@ import {
   UnauthorizedException,
   UseGuards,
   UseInterceptors,
-  ValidationPipe,
 } from '@nestjs/common';
 import {
   ApiForbiddenResponse,
@@ -23,7 +22,6 @@ import {
   ApiOkResponse,
   ApiOperation,
   ApiParam,
-  ApiProperty,
   ApiQuery,
   ApiSecurity,
   ApiTags,
@@ -31,8 +29,8 @@ import {
 import Jwt2FAGuard from 'src/auth/guards/jwt-2fa.guard';
 import { ChannelsService } from 'src/prisma/channels/channels.service';
 import { ChannelPasswordInterceptor } from '../interceptors/channelPassword.interceptor';
-import { ChannelDTO, ChannelMessageDTO } from '../dto/channel.dto';
-import { MessagesService } from '../messages.service';
+import { ChannelDTO } from '../dto/channel.dto';
+import { ChannelsGateway } from '../channels.gateway';
 
 @Controller('channels')
 @UseGuards(Jwt2FAGuard)
@@ -41,7 +39,7 @@ import { MessagesService } from '../messages.service';
 export class ChannelCrudController {
   constructor(
     private readonly channelService: ChannelsService,
-    private readonly messageService: MessagesService,
+    private readonly channelGateway: ChannelsGateway,
   ) {}
 
   @Get('/')
@@ -61,12 +59,20 @@ export class ChannelCrudController {
   })
   @UseInterceptors(ChannelPasswordInterceptor)
   async create(@Req() req, @Body() channel: ChannelDTO) {
-    return await this.channelService.create(
+    const chann = await this.channelService.create(
       channel.name,
       channel.type,
       channel.password,
       req.user,
     );
+
+    await this.channelGateway.userJoinChannel(chann, req.user);
+
+    return {
+      id: chann.id,
+      type: chann.type,
+      name: chann.name,
+    };
   }
 
   @Get('/:id')
@@ -137,6 +143,7 @@ export class ChannelCrudController {
     // Only owner can delete channel
     if (req.user.id != channel.ownerId) throw new ForbiddenException();
 
+    await this.channelGateway.deleteChannel(channel);
     await this.channelService.delete(channel);
     return 'ok';
   }

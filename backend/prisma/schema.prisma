@@ -104,8 +104,8 @@ model ChannelMessage {
   channelId Int
   content   String
 
-  User    User    @relation(fields: [userId], references: [id])
-  Channel Channel @relation(fields: [channelId], references: [id])
+  User    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  Channel Channel @relation(fields: [channelId], references: [id], onDelete: Cascade)
 
   type ChannelMessageType @default(MESSAGE)
 

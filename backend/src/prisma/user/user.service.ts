@@ -2,6 +2,12 @@ import { Injectable, OnModuleInit } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { Prisma, Status, User } from '@prisma/client';
 
+export interface UserRequest {
+  id: number;
+  name: string;
+  avatar?: string;
+}
+
 @Injectable()
 export class UserService implements OnModuleInit {
   constructor(private readonly prisma: PrismaService) {}

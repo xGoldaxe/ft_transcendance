@@ -14,8 +14,6 @@ import {
   UnauthorizedException,
   UseGuards,
   UseInterceptors,
-  UsePipes,
-  ValidationPipe,
 } from '@nestjs/common';
 import {
   ApiForbiddenResponse,
@@ -34,6 +32,7 @@ import { ChannelsService } from 'src/prisma/channels/channels.service';
 import { ChannelPasswordInterceptor } from '../interceptors/channelPassword.interceptor';
 import { ChannelPasswordDTO, UserRoleDTO } from '../dto/channel.dto';
 import { MessagesService } from '../messages.service';
+import { ChannelsGateway } from '../channels.gateway';
 
 @Controller('channels')
 @UseGuards(Jwt2FAGuard)
@@ -43,6 +42,7 @@ export class ChannelActionController {
   constructor(
     private readonly channelService: ChannelsService,
     private readonly messageService: MessagesService,
+    private readonly channelGateway: ChannelsGateway,
   ) {}
 
   @Post('/:id/join')
@@ -96,6 +96,7 @@ export class ChannelActionController {
             req.user,
             ChannelUserStatus.USER,
           );
+          await this.channelGateway.userJoinChannel(channel, req.user);
           return channel;
 
         default:
@@ -115,6 +116,7 @@ export class ChannelActionController {
     }
 
     await this.channelService.addUser(channel, req.user);
+    await this.channelGateway.userJoinChannel(channel, req.user);
     return await this.channelService.channel(id);
   }
 
@@ -159,7 +161,11 @@ export class ChannelActionController {
         req.user,
         ChannelUserStatus.BAN,
       );
+    else if (userChannel.state == ChannelUserStatus.BAN)
+      throw new HttpException('User not in the channel', HttpStatus.NOT_FOUND);
     else await this.channelService.removeUser(channel, req.user);
+
+    await this.channelGateway.userLeftChannel(channel, req.user);
 
     return 'ok';
   }
@@ -191,13 +197,15 @@ export class ChannelActionController {
     const channel = await this.channelService.channel(id);
     if (!channel) throw new NotFoundException();
 
-    const chanReqUsers = channel.users.filter((u) => u.user.id == req.user.id);
+    const chanReqUsers = channel.users.filter((u) => u.userId == req.user.id);
     const chanTargetUsers = channel.users.filter(
-      (u) => u.user.id == userForm.userID,
+      (u) => u.userId == userForm.userID,
     );
 
-    if (chanReqUsers.length != 1) throw new UnauthorizedException();
-    if (chanTargetUsers.length != 1) throw new NotFoundException();
+    if (chanReqUsers.length != 1)
+      throw new UnauthorizedException('Connected user not in channel');
+    if (chanTargetUsers.length != 1)
+      throw new NotFoundException('Requested user not in channel');
     const chanReqUser = chanReqUsers[0];
     const chanTargetUser = chanTargetUsers[0];
 
@@ -216,7 +224,20 @@ export class ChannelActionController {
         channel,
         chanTargetUser.user,
         userForm.role,
+        new Date(userForm.until),
       );
+
+      if (
+        userForm.role == ChannelUserStatus.BAN ||
+        userForm.role == ChannelUserStatus.KICK
+      )
+        await this.channelGateway.userLeftChannel(channel, chanTargetUser.user);
+      else
+        await this.channelGateway.actionOnChannel(channel, {
+          role: userForm.role,
+          user: chanTargetUser.user,
+        });
+
       return 'ok';
     }
     throw new ForbiddenException();

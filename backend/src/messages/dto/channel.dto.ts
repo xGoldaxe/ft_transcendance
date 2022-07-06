@@ -5,6 +5,7 @@ import {
   IsDateString,
   IsEnum,
   IsNumber,
+  IsOptional,
   IsString,
   ValidateIf,
 } from 'class-validator';
@@ -34,6 +35,7 @@ export class ChannelDTO {
 
 export class ChannelPasswordDTO {
   @IsString()
+  @IsOptional()
   @ApiPropertyOptional({
     required: false,
     description: 'Nécessaire si le channel est protégé',

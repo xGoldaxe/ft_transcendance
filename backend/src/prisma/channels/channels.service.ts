@@ -68,11 +68,6 @@ export class ChannelsService {
         },
         password: hashedPassword,
       },
-      select: {
-        id: true,
-        type: true,
-        name: true,
-      },
     });
   }
 
@@ -242,7 +237,7 @@ export class ChannelsService {
   }
 
   async delete(channel: Channel) {
-    return this.prisma.channel.delete({
+    return this.prisma.channel.deleteMany({
       where: {
         id: channel.id,
       },
