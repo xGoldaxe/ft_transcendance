@@ -5,7 +5,8 @@ export function useModal(children: ReactElement<any, any>) {
 
 	const [open, setOpen] = useState(false);
 	const modal = <Modal open={open} setOpen={setOpen}>{children}</Modal>
-	return { 
+	return {
+		isOpen: open,
 		modal: modal,
 		setOpen: setOpen
 	}
@@ -22,7 +23,7 @@ export default function Modal({ children, open, setOpen }:
 				height: '100vh',
 				position: 'absolute',
 				top: 0,
-				zIndex: 1000
+				zIndex: 1000,
 			}}>
 				<div className="Modal__bg" style={{
 					width: '100vw',

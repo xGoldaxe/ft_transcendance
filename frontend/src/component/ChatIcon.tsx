@@ -4,34 +4,32 @@ import Logo from '../images/talk.svg'
 import Modal, { useModal } from './Modal'
 import ModalBox from './ModalBox';
 import Chat from '../pages/Chat';
-import { useLocation } from 'react-router-dom'
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 
 export default function ChatIcon({ constraintsRef } :
 { constraintsRef: React.MutableRefObject<null> }) {
 
 	// const [draggin, setDraggin] = useState<boolean>(false);
-	var { modal, setOpen } = useModal(<Chat />);
-	let location = useLocation();
+	var { isOpen, modal, setOpen } = useModal(<Chat />);
+	var [searchParams, setSearchParams] = useSearchParams();
+
+	useEffect(()=>{
+		var isOpen = searchParams.get('chat')
+		if (isOpen === 'open')
+			setOpen(true)
+	}, [searchParams])
 
 	useEffect(() => {
-		setOpen(false);
-	}, [location]);
+		searchParams.delete('chat')
+		if (isOpen === true)
+			searchParams.append('chat', 'open')
+		setSearchParams(searchParams)
+	}, [isOpen])
 	
+	function onClick() {
+		setOpen(true)
+	}
 
-	// var tap = () => {
-	// 	var drag = draggin;
-	// 	return () => {
-	// 		console.log('taptap ' + drag)
-	// 		if (drag === true)
-	// 			setDraggin(false);
-	// 		else	
-	// 			setOpen(true);
-	// 	}
-	// }
-	// function drag() {
-	// 	console.log(draggin)
-	// 	setDraggin(true)
-	// }
 	return (
 		<>
 			<motion.img
@@ -41,11 +39,7 @@ export default function ChatIcon({ constraintsRef } :
 			dragConstraints={constraintsRef}
 			dragMomentum={false}
 			src={Logo} alt='logo'
-
-			// onDragStart={drag}
-			onClick={()=>{setOpen(true)}}
-			// onTap={tap()}
-			// onTapCancel={tap()}
+			onClick={onClick}
 			>
 			</motion.img>
 			{modal}

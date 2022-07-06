@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import menu from '../images/menu.svg'
 import bin from '../images/bin.svg'
-import checkbox from '../images/checkbox.svg'
 
 export default function Listing({name, data, setData}:
 {name: string, data: string[], setData: (arg0: string[])=>(void)}) {
@@ -99,7 +98,7 @@ export default function Listing({name, data, setData}:
 					style={{ transformOrigin: 'top center' }}
 					>
 						{data.map((elem: string, index: number)=> 
-						<div className='Listing__element' onClick={()=>selectSelf(index)}>
+						<div key={index} className='Listing__element' onClick={()=>selectSelf(index)}>
 							{elem}
 							<div className='Listing__name__images'>
 								<input 
@@ -107,7 +106,6 @@ export default function Listing({name, data, setData}:
 								className='Listing__name__checkbox'
 								checked={selected.includes(index)}
 								onChange={()=>selectSelf(index)}
-								key={index}
 								/>
 								<img src={bin} alt=''
 								onClick={(e)=>{

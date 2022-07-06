@@ -1,4 +1,5 @@
-import { useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import useContextMenu from '../lib/generateMenu';
 
 export function NameWithMenu({ name }: { name: string }) {
@@ -24,12 +25,19 @@ export function NameWithMenu({ name }: { name: string }) {
 		}
 	])
 	let navigate = useNavigate();
+	var [searchParams, setSearchParams] = useSearchParams();
+	
+	function onClick() {
+		searchParams.set('name', name)
+		searchParams.delete('chat')
+		navigate(`/profile?${searchParams}`)
+	}
 
 	return (
 		<span
 		className={'NameWithMenu'}
 		onContextMenu={(e)=>generateMenu(e)}
-		onClick={()=>{navigate(`/profile?name=${name}`)}}
+		onClick={onClick}
 		>
 			{name}
 		</span>

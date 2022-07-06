@@ -8,6 +8,7 @@
 @import 'scss/pages/page404.scss';
 @import 'scss/pages/chat.scss';
 @import 'scss/pages/channelParameter.scss';
+@import 'scss/pages/joinRoom.scss';
 
 /* component */
 @import 'scss/component/game.scss';
@@ -21,7 +22,9 @@
 @import 'scss/component/listing.scss';
 @import 'scss/component/saveBox.scss';
 @import 'scss/component/imageUploader.scss';
+@import 'scss/component/friendList.scss';
 
 /* utils */
 @import 'scss/utils/containers.scss';
 @import 'scss/utils/fonts.scss';
+@import 'scss/utils/button.scss';
