@@ -62,6 +62,7 @@ function player( gameId: string, gameData: gameData ) {
 
 	setInterval(() => {
 		
+		//time
 		if (keycode === 68 && speed < maxSpeed)
 			speed += friction;
 		else if (keycode === 65 && speed > -maxSpeed)

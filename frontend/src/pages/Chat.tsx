@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import ReactTextareaAutosize from 'react-textarea-autosize';
 import ModalBox from '../component/ModalBox';
 import ProfilBox, { NameWithMenu } from '../component/ProfilBox';
@@ -8,6 +8,9 @@ import useContextMenu from '../lib/generateMenu';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import InvisibleInput, { InvisibleInputSelect } from '../component/InvisibleInput';
 import Listing from '../component/Listing';
+import SaveBox from '../component/SaveBox';
+import _, { rest } from 'lodash'
+import ImageUploader from '../component/ImageUploader';
 
 
 function Message({ content, user, direction='left' }: { content: string, user: string, direction?: string }) {
@@ -88,23 +91,115 @@ function ChatUi() {
 	)
 }
 
+type ServerProtection = 'Private' | 'Protected' | 'Public'
+
+interface RoomOpt {
+	image: any | string,
+	name: string,
+	serverProtection: string,
+	pass: string,
+	admin: string[],
+	muted: string[],
+	banned: string[]
+}
+
 function ChannelParameter() {
+
+	const [global, setGlobal] = useState<RoomOpt>({
+		image: 'https://pierreevl.vercel.app/image/logo.jpg',
+		name: 'Super name for room',
+		serverProtection: 'Public',
+		pass: '',
+		admin: ['pleveque0', 'pleveque1', 'pleveque2'],
+		muted: ['pleveque0', 'pleveque1', 'pleveque2'],
+		banned: ['pleveque0', 'pleveque1', 'pleveque2']
+	})
+	const [local, setLocal] = useState<RoomOpt>({image: '', name: '',serverProtection: 'Private',pass: '',admin: [],muted: [],banned: []})
+	const [modified, setModified] = useState<boolean>(false)
+	useEffect(() => {setLocal(Object.assign({}, global))}, [global])
+	
+	/*update local */
+	function setImage(image: any) {
+		var newLocal: RoomOpt = Object.assign({}, local);
+		newLocal.image = image
+		setLocal(newLocal)
+	}
+	function resetImage() {
+		var newLocal: RoomOpt = Object.assign({}, local);
+		newLocal.image = global.image
+		setLocal(newLocal)
+	}
+	function setServerProtection(value: string) {
+		var newLocal: RoomOpt = Object.assign({}, local);
+		newLocal.serverProtection = value
+		setLocal(newLocal)
+	}
+	function setAdmin(admins: string[]) {
+		var newLocal: RoomOpt = Object.assign({}, local);
+		newLocal.admin = admins
+		setLocal(newLocal)
+	}
+	function setMuted(muteds: string[]) {
+		var newLocal: RoomOpt = Object.assign({}, local);
+		newLocal.muted = muteds
+		setLocal(newLocal)
+	}
+	function setBanned(banneds: string[]) {
+		var newLocal: RoomOpt = Object.assign({}, local);
+		newLocal.banned = banneds
+		setLocal(newLocal)
+	}
+	function setRoomName(name: string) {
+		var newLocal: RoomOpt = Object.assign({}, local);
+		newLocal.name = name
+		setLocal(newLocal)
+	}
+	function setRoomPass(pass: string) {
+		var newLocal: RoomOpt = Object.assign({}, local);
+		newLocal.pass = pass
+		setLocal(newLocal)
+	}
+	/*update local */
+
+	function compareState() {
+		if (_.isEqual(local, global) === false)
+			setModified(true)
+		else
+			setModified(false)
+	}
+
+	function reset() {
+		setLocal(Object.assign({}, global))
+	}
+
+	useEffect(() => {
+		compareState()
+	}, [local])
+
 	return (
 		<div className='ChannelParameter--container'>
 			<div className='ChannelParameter'>
-				<div className='ChannelParameter__image'></div>
-				<div className='ChannelParameter__name'>channel name</div>
+				<div className='ChannelParameter__image'>
+					<img
+					alt="not fount"
+					src={typeof(local.image) === 'string' ? local.image
+					: URL.createObjectURL(local.image)}
+					onError={resetImage}
+					/>
+					<ImageUploader setSelectedImage={setImage}/>
+				</div>
+				<InvisibleInput name={'Room name'} value={local.name} setValue={setRoomName}/>
 				<InvisibleInputSelect name={'Server protection'} choices={[
 					'Private',
 					'Protected',
 					'Public'
-				]} />
-				<InvisibleInput name={'Pass for room'} isLock={true}/>
-				<Listing name={'Admins'} data={['pleveque', 'pleveque', 'pleveque']}/>
-				<Listing name={'Banned'} data={['tbelhomm', 'tbelhomm', 'tbelhomm']}/>
-				{/* <div>Admins</div>
-				<div>Banned</div>
-				<div>muted</div> */}
+				]} setSelected={setServerProtection} selected={local.serverProtection}/>
+				<InvisibleInput name={'Pass for room'} isLock={local.serverProtection !== 'Protected'}
+				value={local.pass} setValue={setRoomPass}/>
+				<Listing name={'Admins'} data={local.admin} setData={setAdmin}/>
+				<Listing name={'Muted'} data={local.muted} setData={setMuted}/>
+				<Listing name={'Banned'} data={local.banned} setData={setBanned}/>
+				{modified && <SaveBox onReset={reset} onSave={()=>console.log('send')}/>}
 			</div>
 		</div>
 	)
@@ -167,7 +262,13 @@ function ChannelContextMenu({ children, channel, isOnClick=false }:
 
 	const generateMenu = useContextMenu([
 		{
-			name: 'Channel parameter',
+			name: 'Create Invitation',
+			func: function renamePage() {
+				console.log("weq");
+			}
+		},
+		{
+			name: 'Channel settings',
 			func: function renamePage() {
 				console.log("weq");
 			}
@@ -228,7 +329,7 @@ export default function Chat() {
 						</div>
 					</ChannelContextMenu>
 
-					{getChannelRoute('/parameter')}
+					{getChannelRoute('/home')}
 				</div>
 			</div>
 		</ModalBox>
