@@ -44,8 +44,8 @@ function History({ name }: { name: string }) {
 
 	return (
 		<div className='History'>
-			{games.map(game =>
-				<HistoryGame game={game}/> 
+			{games.map((game, index) =>
+				<HistoryGame key={index} game={game}/> 
 			)}
 		</div>
 	)

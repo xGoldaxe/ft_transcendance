@@ -6,7 +6,10 @@
 @import 'scss/pages/home.scss';
 @import 'scss/pages/profile.scss';
 @import 'scss/pages/page404.scss';
-@import 'scss/pages/chat.scss';
+/*chat*/
+@import 'scss/pages/chat/chat.scss';
+@import 'scss/pages/chat/message.scss';
+/*chat*/
 @import 'scss/pages/channelParameter.scss';
 @import 'scss/pages/joinRoom.scss';
 
@@ -23,6 +26,7 @@
 @import 'scss/component/saveBox.scss';
 @import 'scss/component/imageUploader.scss';
 @import 'scss/component/friendList.scss';
+@import 'scss/component/matchmakingBox.scss';
 
 /* utils */
 @import 'scss/utils/containers.scss';

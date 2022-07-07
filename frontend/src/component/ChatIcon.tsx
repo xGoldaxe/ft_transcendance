@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect } from 'react'
 import { motion } from "framer-motion"
 import Logo from '../images/talk.svg'
-import Modal, { useModal } from './Modal'
-import ModalBox from './ModalBox';
-import Chat from '../pages/Chat';
-import { useLocation, useNavigate, useSearchParams } from 'react-router-dom'
+import Chat from '../pages/Chat/Chat';
+import { useSearchParams } from 'react-router-dom'
+import { useModal } from './Modal';
 
 export default function ChatIcon({ constraintsRef } :
 { constraintsRef: React.MutableRefObject<null> }) {
@@ -17,6 +16,8 @@ export default function ChatIcon({ constraintsRef } :
 		var isOpen = searchParams.get('chat')
 		if (isOpen === 'open')
 			setOpen(true)
+		else
+			setOpen(false)
 	}, [searchParams])
 
 	useEffect(() => {
@@ -28,6 +29,9 @@ export default function ChatIcon({ constraintsRef } :
 	
 	function onClick() {
 		setOpen(true)
+	}
+	function goHome() {
+		
 	}
 
 	return (
@@ -42,6 +46,11 @@ export default function ChatIcon({ constraintsRef } :
 			onClick={onClick}
 			>
 			</motion.img>
+			<div className='chatBox'>
+				<img src={Logo} alt='' onClick={onClick}/>
+				<img src={Logo} alt='' onClick={goHome}/>
+				<img src={Logo} alt='' onClick={goHome}/>
+			</div>
 			{modal}
 		</>
 	)

@@ -1,100 +1,18 @@
 import React, { useEffect, useRef, useState } from 'react'
 import ReactTextareaAutosize from 'react-textarea-autosize';
-import ModalBox from '../component/ModalBox';
-import ProfilBox, { NameWithMenu } from '../component/ProfilBox';
-import send from '../images/send.svg'
-import menu from '../images/menu.svg'
-import cross from '../images/cross.svg'
-import game from '../images/game.svg'
-import chat from '../images/chat.svg'
-import friendAdd from '../images/friendAdd.svg'
-import useContextMenu from '../lib/generateMenu';
-import InvisibleInput, { InvisibleInputSelect } from '../component/InvisibleInput';
-import Listing from '../component/Listing';
-import SaveBox from '../component/SaveBox';
-import _ from 'lodash'
-import ImageUploader from '../component/ImageUploader';
+import ModalBox from '../../component/ModalBox';
+import ProfilBox, { NameWithMenu } from '../../component/ProfilBox';
+import menu from '../../images/menu.svg'
+import chat from '../../images/chat.svg'
+import friendAdd from '../../images/friendAdd.svg'
+import useContextMenu from '../../lib/generateMenu';
+import InvisibleInput, { InvisibleInputSelect } from '../../component/InvisibleInput';
+import Listing from '../../component/Listing';
+import SaveBox from '../../component/SaveBox';
+import ImageUploader from '../../component/ImageUploader';
 import { useSearchParams } from 'react-router-dom';
-
-
-function Message({ content, user, direction='left' }: { content: string, user: string, direction?: string }) {
-
-	if (direction === 'right')
-	{
-		return (
-			<div className='Message Message__right'>
-				<div className='Message__data'>
-					<p className='Message__name Message__right__name'>
-						<span className='Message__date Message__right__date'>11:52</span>
-						<NameWithMenu name={user} />
-					</p>
-					<div className='Message__content Message__right__content'>{content}</div>
-				</div>
-				<div className='Message__image Message__right__image'></div>
-			</div>
-		)
-	}
-	return (
-		<div className='Message'>
-			<div className='Message__image Message__left__image'></div>
-			<div className='Message__data'>
-				<p className='Message__name'>
-					<NameWithMenu name={user} />
-					<span className='Message__date Message__left__date'>11:52</span>
-				</p>
-				<div className='Message__content Message__left__content'>{content}</div>
-			</div>
-		</div>
-	)
-}
-
-function ChatUi() {
-
-	const ref = useRef<any>()
-	const [value, setValue] = useState<string>('')
-
-	function focus() {
-		if(ref.current) ref.current.focus(); 
-	}
-	function sendMessage(e: React.MouseEvent<HTMLDivElement>) {
-		e.stopPropagation()
-		if (value.length > 0)
-			console.log(value)
-		else
-			console.log('empty message!')
-		setValue('')
-	}
-	
-	return (
-		<div className='ChatUi'>
-			<div className='ChatUi__message'>
-				<div className='ChatUi__message__container'>
-					<Message content={'hello world'} user={'pleveque'} />
-					<Message content={'hello world'} user={'pleveque'} />
-					<Message content={'hello world'} user={'pleveque'} />
-					<Message content={'hello world'} user={'pleveque'} />
-					<Message content={'hello world'} user={'pleveque'} />
-					<Message content={'hello world'} user={'pleveque'} />
-					<Message content={'hello world'} user={'pleveque'} />
-					<Message content={'hello world'} user={'pleveque'} />
-					<Message content={'hello world'} user={'pleveque'} />
-					<Message content={'hello world'} user={'pleveque'} />
-					<Message content={'hello world this is a verty longn messag hello world this is a verty longn messag hello world this is a verty longn messag'} user={'pleveque'} />
-					<Message direction={'right'} content={'hello world this is a verty longn messag hello world this is a verty longn messag hello world this is a verty longn messag'} user={'pleveque'} />
-				</div>
-			</div>
-			<div className='ChatUi__input' onClick={focus}>
-				<ReactTextareaAutosize
-				ref={ref}
-				onChange={ev => setValue(ev.target.value)}
-				value={value}
-				/>
-				<img className='ChatUi__input__button' src={game} alt={'game'} onClick={(e)=>sendMessage(e)}/>
-				<img className='ChatUi__input__button' src={send} alt={'send'} onClick={(e)=>sendMessage(e)}/>
-			</div>
-		</div>
-	)
-}
+import ChatUi from './Message';
+import { ChannelParameter } from './Settings';
 
 function FriendListFriend({name, pending}: {name: string, pending?: boolean}) {
 
@@ -152,127 +70,6 @@ function FriendList() {
 				<FriendListFriend name={'friend1'} />
 				<FriendListFriend name={'friend1'} />
 				<FriendListFriend name={'friend1'} />
-			</div>
-		</div>
-	)
-}
-
-type ServerProtection = 'Private' | 'Protected' | 'Public'
-
-interface RoomOpt {
-	image: any | string,
-	name: string,
-	serverProtection: string,
-	pass: string,
-	admin: string[],
-	muted: string[],
-	banned: string[]
-}
-
-function ChannelParameter() {
-
-	const [global, setGlobal] = useState<RoomOpt>({
-		image: 'https://pierreevl.vercel.app/image/logo.jpg',
-		name: 'Super name for room',
-		serverProtection: 'Public',
-		pass: '',
-		admin: ['pleveque0', 'pleveque1', 'pleveque2'],
-		muted: ['pleveque0', 'pleveque1', 'pleveque2'],
-		banned: ['pleveque0', 'pleveque1', 'pleveque2']
-	})
-	const [local, setLocal] = useState<RoomOpt>({image: '', name: '',serverProtection: 'Private',pass: '',admin: [],muted: [],banned: []})
-	const [modified, setModified] = useState<boolean>(false)
-	useEffect(() => {setLocal(Object.assign({}, global))}, [global])
-	var [searchParams, setSearchParams] = useSearchParams()
-
-	function close() {
-		searchParams.set('roomLocation', 'room/home')
-		setSearchParams(searchParams)
-	}
-	
-	/*update local */
-	function setImage(image: any) {
-		var newLocal: RoomOpt = Object.assign({}, local);
-		newLocal.image = image
-		setLocal(newLocal)
-	}
-	function resetImage() {
-		var newLocal: RoomOpt = Object.assign({}, local);
-		newLocal.image = global.image
-		setLocal(newLocal)
-	}
-	function setServerProtection(value: string) {
-		var newLocal: RoomOpt = Object.assign({}, local);
-		newLocal.serverProtection = value
-		setLocal(newLocal)
-	}
-	function setAdmin(admins: string[]) {
-		var newLocal: RoomOpt = Object.assign({}, local);
-		newLocal.admin = admins
-		setLocal(newLocal)
-	}
-	function setMuted(muteds: string[]) {
-		var newLocal: RoomOpt = Object.assign({}, local);
-		newLocal.muted = muteds
-		setLocal(newLocal)
-	}
-	function setBanned(banneds: string[]) {
-		var newLocal: RoomOpt = Object.assign({}, local);
-		newLocal.banned = banneds
-		setLocal(newLocal)
-	}
-	function setRoomName(name: string) {
-		var newLocal: RoomOpt = Object.assign({}, local);
-		newLocal.name = name
-		setLocal(newLocal)
-	}
-	function setRoomPass(pass: string) {
-		var newLocal: RoomOpt = Object.assign({}, local);
-		newLocal.pass = pass
-		setLocal(newLocal)
-	}
-	/*update local */
-
-	function compareState() {
-		if (_.isEqual(local, global) === false)
-			setModified(true)
-		else
-			setModified(false)
-	}
-
-	function reset() {
-		setLocal(Object.assign({}, global))
-	}
-
-	useEffect(() => {
-		compareState()
-	}, [local])
-
-	return (
-		<div className='ChannelParameter--container'>
-			<div className='ChannelParameter'>
-				<img onClick={close} src={cross} className='ChannelParameter__cross' alt='' />
-				<div className='ChannelParameter__image'>
-					<img
-					alt="not fount"
-					src={typeof(local.image) === 'string' ? local.image
-					: URL.createObjectURL(local.image)}
-					onError={resetImage}
-					/>
-					<ImageUploader setSelectedImage={setImage}/>
-				</div>
-				<InvisibleInput name={'Room name'} value={local.name} setValue={setRoomName}/>
-				<InvisibleInputSelect name={'Server protection'} choices={[
-					'Private',
-					'Protected',
-					'Public'
-				]} setSelected={setServerProtection} selected={local.serverProtection}/>
-				<InvisibleInput name={'Pass for room'} isLock={local.serverProtection !== 'Protected'}
-				value={local.pass} setValue={setRoomPass}/>
-				<Listing name={'Admins'} data={local.admin} setData={setAdmin}/>
-				<Listing name={'Muted'} data={local.muted} setData={setMuted}/>
-				<Listing name={'Banned'} data={local.banned} setData={setBanned}/>
-				{modified && <SaveBox onReset={reset} onSave={()=>console.log('send')}/>}
 			</div>
 		</div>
 	)
@@ -402,7 +199,6 @@ interface Room {
 }
 
 export default function Chat() {
-
 	var [searchParams, setSearchParams] = useSearchParams();
 	const [room, setRoom] = useState<Room | null>(null)
 

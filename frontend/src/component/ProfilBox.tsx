@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import useContextMenu from '../lib/generateMenu';
 
@@ -27,7 +27,8 @@ export function NameWithMenu({ name }: { name: string }) {
 	let navigate = useNavigate();
 	var [searchParams, setSearchParams] = useSearchParams();
 	
-	function onClick() {
+	function onClick(e: React.MouseEvent<HTMLElement>) {
+		e.stopPropagation()
 		searchParams.set('name', name)
 		searchParams.delete('chat')
 		navigate(`/profile?${searchParams}`)
