@@ -1,18 +1,17 @@
 import React, { useEffect, useRef, useState } from 'react'
-import ReactTextareaAutosize from 'react-textarea-autosize';
 import ModalBox from '../../component/ModalBox';
 import ProfilBox, { NameWithMenu } from '../../component/ProfilBox';
 import menu from '../../images/menu.svg'
 import chat from '../../images/chat.svg'
+import arrow from '../../images/arrow.svg'
 import friendAdd from '../../images/friendAdd.svg'
 import useContextMenu from '../../lib/generateMenu';
 import InvisibleInput, { InvisibleInputSelect } from '../../component/InvisibleInput';
-import Listing from '../../component/Listing';
-import SaveBox from '../../component/SaveBox';
-import ImageUploader from '../../component/ImageUploader';
 import { useSearchParams } from 'react-router-dom';
 import ChatUi from './Message';
 import { ChannelParameter } from './Settings';
+import { AnimatePresence, motion } from 'framer-motion'
+import AllChannel from './AllChannel';
 
 function FriendListFriend({name, pending}: {name: string, pending?: boolean}) {
 
@@ -94,71 +93,71 @@ function ChannelJoin() {
 
 function RoomUsers() {
 
+	const [windowDimensions, setWindowDimensions] = useState(getWindowDimensions())
+	const [open, setOpen] = useState<boolean>(false)
+
+	useEffect(()=>{
+		if (windowDimensions.width > 700)
+			setOpen(true)
+	}, [windowDimensions])
+	function onClick() {
+		setOpen(!open)
+	}
 	return (
 		<div className='RoomUsers--container'>
-			<div className='RoomUsers'>
-				<div className='RoomUsers__section'>
-					<div className='RoomUsers__section__name'>
-						Super Admin -
-					</div>
-					<ProfilBox name={'pleveque'} cName={'RoomUsers__section__profile'} precClass={'RoomUsers__section__profile--red'}/>
+			{windowDimensions.width <= 700 && <div className='RoomUsers__openButton' onClick={onClick}>
+					{open ? <img src={arrow} alt='' style={{transform: 'rotate(180deg)'}}/>
+					: <img src={arrow} alt='' /> }
 				</div>
+			}
+			<AnimatePresence>
+			{open &&
+				<motion.div
+				initial={{ scaleX: 0 }}
+				animate={{ scaleX: 1 }}
+				exit={{ scaleX: 0 }}
+				style={{ transformOrigin: 'center right' }}
+				className='RoomUsers'>
+					<div className='RoomUsers__section'>
+						<div className='RoomUsers__section__name'>
+							Super Admin -
+						</div>
+						<ProfilBox name={'pleveque'} cName={'RoomUsers__section__profile'} precClass={'RoomUsers__section__profile--red'}/>
+					</div>
 
-				<div className='RoomUsers__section'>
-					<div className='RoomUsers__section__name'>
-						Admins -
+					<div className='RoomUsers__section'>
+						<div className='RoomUsers__section__name'>
+							Admins -
+						</div>
+						<ProfilBox name={'pleveque'} cName={'RoomUsers__section__profile'} precClass={'RoomUsers__section__profile--red'}/>
+						<ProfilBox name={'pleveque'} cName={'RoomUsers__section__profile'} precClass={'RoomUsers__section__profile--red'}/>
+						<ProfilBox name={'pleveque'} cName={'RoomUsers__section__profile'} precClass={'RoomUsers__section__profile--red'}/>
+						<ProfilBox name={'pleveque'} cName={'RoomUsers__section__profile'} precClass={'RoomUsers__section__profile--gold'}/>
 					</div>
-					<ProfilBox name={'pleveque'} cName={'RoomUsers__section__profile'} precClass={'RoomUsers__section__profile--red'}/>
-					<ProfilBox name={'pleveque'} cName={'RoomUsers__section__profile'} precClass={'RoomUsers__section__profile--red'}/>
-					<ProfilBox name={'pleveque'} cName={'RoomUsers__section__profile'} precClass={'RoomUsers__section__profile--red'}/>
-					<ProfilBox name={'pleveque'} cName={'RoomUsers__section__profile'} precClass={'RoomUsers__section__profile--gold'}/>
-				</div>
 
-				<div className='RoomUsers__section'>
-					<div className='RoomUsers__section__name'>
-						Users -
+					<div className='RoomUsers__section'>
+						<div className='RoomUsers__section__name'>
+							Users -
+						</div>
+						<ProfilBox name={'pleveque'} cName={'RoomUsers__section__profile'} />
+						<ProfilBox name={'pleveque'} cName={'RoomUsers__section__profile'} />
+						<ProfilBox name={'pleveque'} cName={'RoomUsers__section__profile'} />
+						<ProfilBox name={'pleveque'} cName={'RoomUsers__section__profile'} />
+						<ProfilBox name={'pleveque'} cName={'RoomUsers__section__profile'} />
+						<ProfilBox name={'pleveque'} cName={'RoomUsers__section__profile'} />
+						<ProfilBox name={'pleveque'} cName={'RoomUsers__section__profile'} />
+						<ProfilBox name={'pleveque'} cName={'RoomUsers__section__profile'} />
+						<ProfilBox name={'pleveque'} cName={'RoomUsers__section__profile'} />
+						<ProfilBox name={'pleveque'} cName={'RoomUsers__section__profile'} />
+						<ProfilBox name={'pleveque'} cName={'RoomUsers__section__profile'} />
 					</div>
-					<ProfilBox name={'pleveque'} cName={'RoomUsers__section__profile'} />
-					<ProfilBox name={'pleveque'} cName={'RoomUsers__section__profile'} />
-					<ProfilBox name={'pleveque'} cName={'RoomUsers__section__profile'} />
-					<ProfilBox name={'pleveque'} cName={'RoomUsers__section__profile'} />
-					<ProfilBox name={'pleveque'} cName={'RoomUsers__section__profile'} />
-					<ProfilBox name={'pleveque'} cName={'RoomUsers__section__profile'} />
-					<ProfilBox name={'pleveque'} cName={'RoomUsers__section__profile'} />
-					<ProfilBox name={'pleveque'} cName={'RoomUsers__section__profile'} />
-					<ProfilBox name={'pleveque'} cName={'RoomUsers__section__profile'} />
-					<ProfilBox name={'pleveque'} cName={'RoomUsers__section__profile'} />
-					<ProfilBox name={'pleveque'} cName={'RoomUsers__section__profile'} />
-				</div>
-			</div>
+			</motion.div>
+			}
+			</AnimatePresence>
 		</div>
 	)
 }
-
-function ChatBubble({ name='', roomId, location }
-: {name?: string, roomId?: string, location: string}) {
-
-	var [searchParams, setSearchParams] = useSearchParams()
-	function onClick() {
-		searchParams.set('roomLocation', location)
-		if (roomId)
-			searchParams.set('roomId', roomId)
-		else
-		{
-			//reset
-			searchParams.delete('roomId')
-			searchParams.delete('p_msg')
-		}
-		setSearchParams(searchParams)
-	}
-	return (
-		<ChannelContextMenu channel={'channel name'}>
-			<div className='Chat__channels__bubble' onClick={onClick}>{name}</div>
-		</ChannelContextMenu>
-	)
-}
-
-function ChannelContextMenu({ children, channel, isOnClick=false }:
+export function ChannelContextMenu({ children, channel, isOnClick=false }:
 { children: JSX.Element, channel: string, isOnClick?: boolean }) {
 
 	var [searchParams, setSearchParams] = useSearchParams()
@@ -198,6 +197,14 @@ interface Room {
 	name: string
 }
 
+export function getWindowDimensions() {
+	const { innerWidth: width, innerHeight: height } = window;
+	return {
+		width,
+		height
+	};
+}
+
 export default function Chat() {
 	var [searchParams, setSearchParams] = useSearchParams();
 	const [room, setRoom] = useState<Room | null>(null)
@@ -217,28 +224,8 @@ export default function Chat() {
 	return (
 		<ModalBox>
 			<div className='Chat'>
-				<div className='Chat__channels'>
-					<div className='Chat__channels__home'>
-						<ChatBubble location={'home'}/>
-						<hr />
-					</div>
-					{/* get all channels and put them here */}
-					<ChatBubble roomId={'very good room'} location={'room/home'}/>
-					<ChatBubble roomId={'very good room'} location={'room/home'}/>
-					<ChatBubble roomId={'very good room'} location={'room/home'}/>
-					<ChatBubble roomId={'very good room'} location={'room/home'}/>
-					<ChatBubble roomId={'very good room'} location={'room/home'}/>
-					<ChatBubble roomId={'very good room'} location={'room/home'}/>
-					<ChatBubble roomId={'very good room'} location={'room/home'}/>
-					<ChatBubble roomId={'very good room'} location={'room/home'}/>
-					<ChatBubble roomId={'very good room'} location={'room/home'}/>
-					<ChatBubble roomId={'very good room'} location={'room/home'}/>
-					<ChatBubble roomId={'very good room'} location={'room/home'}/>
-					<ChatBubble roomId={'very good room'} location={'room/home'}/>
-					<ChatBubble roomId={'very good room'} location={'room/home'}/>
-					<ChatBubble roomId={'very good room'} location={'room/home'}/>
-				</div>
-
+				<AllChannel />
+				
 				<div className='Chat__right'>
 					{room && <ChannelContextMenu channel={'channel name'} isOnClick={true}>
 						<div className='Chat__right__roomName'>

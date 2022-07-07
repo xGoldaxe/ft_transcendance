@@ -6,17 +6,23 @@ $dark-grey: #8F8A8A;
 	width: 90vw;
 	max-width: 1400px;
 	height: 70vh;
+	background-color: black;
 	&__channels {
+		&--container {
+			overflow: scroll;
+			-ms-overflow-style: none;  /* IE and Edge */
+			scrollbar-width: none;
+			width: min-content;
+			position: relative;
+			background-color: black;
+			max-height: 100%;
+		}
 		padding: 7px 0;
-		overflow: scroll;
-		-ms-overflow-style: none;  /* IE and Edge */
-		scrollbar-width: none;
 		z-index: 3;
-		background-color: black;
 		padding: 0 10px;
 		&__bubble {
-			width: 60px;
-			height: 60px;
+			width: 50px;
+			height: 50px;
 			background-color: $grey;
 			border-radius: 50%;
 			margin: 10px 0;
@@ -41,11 +47,13 @@ $dark-grey: #8F8A8A;
 		display: flex;
 		flex-direction: column;
 		&__roomName {
+			height: 70px;
+			box-sizing: border-box;
 			background-color: $grey;
 			color: black;
 			border-bottom: 2px solid $dark-grey;
 			width: 100%;
-			font-size: 40px;
+			font-size: 35px;
 			padding: 10px 0;
 			font-family: PixelBit;
 			display: flex;
@@ -53,8 +61,8 @@ $dark-grey: #8F8A8A;
 			align-items: center;
 			cursor: pointer;
 			&__image {
-				width: 60px;
-				height: 60px;
+				width: 50px;
+				aspect-ratio: 1/1;
 				border-radius: 50%;
 				background-color: red;
 				margin: 0 20px;
@@ -83,22 +91,20 @@ $dark-grey: #8F8A8A;
 
 .RoomUsers {
 	&--container {
-		overflow: scroll;
+		overflow-y: scroll;
 		-ms-overflow-style: none;  /* IE and Edge */
 		scrollbar-width: none;
-		width: 30%;
-		max-width: 240px;
-		min-width: 240px;
 		position: relative;
-		background-color: $grey;
+		width: fit-content;
 	}
-	position: absolute;
-	width: 100%;
-
+	max-width: 240px;
+	min-width: 240px;
 	padding: 10px 20px;
 	box-sizing: border-box;
+	background-color: $grey;
 	color: black;
 	&__section {
+
 		&__name {
 			font-size: 20px;
 			margin: 7px 0;
@@ -117,6 +123,19 @@ $dark-grey: #8F8A8A;
 				background-color: $dark-grey;
 				border-radius: 50%;
 			}
+		}
+	}
+	&__openButton {
+		position: fixed;
+		background-color: $grey;
+		border-top-left-radius: 3px;
+		border-bottom-left-radius: 3px;
+		transform: translateX(-99%);
+		padding: 5px;
+		margin-top: 20px;
+		img {
+			width: 35px;
+			aspect-ratio: 1/1;
 		}
 	}
 }
@@ -174,6 +193,67 @@ $dark-grey: #8F8A8A;
 			&:hover
 			{
 				transform: scale(1.2);
+			}
+		}
+	}
+}
+
+
+@media screen and (max-width: 700px) {
+	.Chat {
+		width: 100%;
+		&__right {
+			position: relative;
+			border: none;
+			&__roomName {
+				font-size: 20px;
+				height: auto;
+				padding: 0;
+				&__image {
+					display: none;
+				}
+			}
+		}
+		&__channels {
+			&--container {
+				position: absolute;
+				z-index: 2;
+			}
+			&__image {
+				background-color: $grey;
+				border-bottom-left-radius: 3px;
+				border-bottom-right-radius: 3px;
+				display: flex;
+				justify-content: center;
+				cursor: pointer;
+				img {
+					width: 30px;
+					aspect-ratio: 1/1;
+				}
+			}
+			&__bubble {
+				margin: 5px 0;
+				width: 30px;
+				height: 30px;
+			}
+		}
+	}
+	.RoomUsers--container {
+		position: absolute;
+		right: 0;
+		top: 0;
+		height: 100%;
+		z-index: 2;
+	}
+
+	.ChatUi {
+		&__input {
+			textarea {
+				font-size: 12px;
+			}
+			padding: 2px 10px;
+			&__button {
+				width: 20px;
 			}
 		}
 	}
