@@ -2,6 +2,7 @@ import React, { useEffect } from 'react'
 import { useParams, useSearchParams } from 'react-router-dom'
 import ProfilBox, { NameWithMenu } from '../component/ProfilBox'
 import Page404 from './Page404'
+import addFriend from '../images/friendAdd.svg'
 
 interface resumeGame {
 	date: string,
@@ -82,11 +83,12 @@ export default function Profile() {
 					<NameWithMenu name={name} />
 				</p>
 			</div>
+			<div className='ProfilPage__menu'>
+				<img src={addFriend} alt=''/>
+			</div>
 			<Winrate />
 			<History name={name}/>
-			<div className='ProfilPage__bottomBox'>
-				Add to friends
-			</div>
+			<div className='ProfilPage__bottomBox'>Add to friends</div>
 		</>
 	)
 }

@@ -45,6 +45,17 @@
 			transform: scale(1.05);
 		}
 	}
+	&__menu {
+		background-color: white;
+		width: 100%;
+		display: flex;
+		justify-content: center;
+		padding: 20px 0;
+		img {
+			width: 40px;
+			aspect-ratio: 1/1;
+		}
+	}
 }
 
 .Winrate {

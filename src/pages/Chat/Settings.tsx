@@ -68,7 +68,7 @@ export function ChannelParameter() {
 
 	function goHome() {
 		searchParams.set('roomLocation', 'room/home')
-		setSearchParams(searchParams)
+		setSearchParams(searchParams, {replace: true})
 	}
 
 	/*update local */

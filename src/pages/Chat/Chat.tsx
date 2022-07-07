@@ -23,7 +23,7 @@ function FriendListFriend({name, pending}: {name: string, pending?: boolean}) {
 			return
 		}
 		searchParams.set('p_msg', name)
-		setSearchParams(searchParams)
+		setSearchParams(searchParams, {replace: true})
 	}
 
 	return (

@@ -24,7 +24,7 @@ export default function ChatIcon({ constraintsRef } :
 		searchParams.delete('chat')
 		if (isOpen === true)
 			searchParams.append('chat', 'open')
-		setSearchParams(searchParams)
+		setSearchParams(searchParams, {replace: true})
 	}, [isOpen])
 	
 	function onClick() {

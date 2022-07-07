@@ -17,7 +17,7 @@ function ChatBubble({ name='', roomId, location }
 			searchParams.delete('roomId')
 			searchParams.delete('p_msg')
 		}
-		setSearchParams(searchParams)
+		setSearchParams(searchParams, {replace: true})
 	}
 	return (
 		<ChannelContextMenu channel={'channel name'}>
@@ -36,7 +36,8 @@ export default function AllChannel() {
 		setOpen(!open)
 	}
 	function hide() {
-		setOpen(false)
+		if (windowDimensions.width <= 700)
+			setOpen(false)
 	}
 	useEffect(() => {
 		if (windowDimensions.width > 700)
