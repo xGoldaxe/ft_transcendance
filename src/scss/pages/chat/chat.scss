@@ -202,6 +202,7 @@ $dark-grey: #8F8A8A;
 @media screen and (max-width: 700px) {
 	.Chat {
 		width: 100%;
+		height: 100vh;
 		&__right {
 			position: relative;
 			border: none;
@@ -227,14 +228,14 @@ $dark-grey: #8F8A8A;
 				justify-content: center;
 				cursor: pointer;
 				img {
-					width: 30px;
+					width: 40px;
 					aspect-ratio: 1/1;
 				}
 			}
 			&__bubble {
-				margin: 5px 0;
-				width: 30px;
-				height: 30px;
+				margin: 10px 0;
+				width: 40px;
+				height: 40px;
 			}
 		}
 	}

@@ -60,5 +60,8 @@
 		min-width: 100vw;
 		border-radius: 0;
 		background-color: white;
+		&--noTop {
+			top: 0vh;
+		}
 	}
 }

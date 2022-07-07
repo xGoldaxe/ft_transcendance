@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import Modal, { useModal } from "./Modal";
 import ModalBox from "./ModalBox";
 
@@ -26,7 +26,8 @@ export default function MatchMakingButton({children}: {children: JSX.Element}) {
 
 	const [modal, setModal] = useState<boolean>(false)
 
-	function open() {
+	function open(e: React.MouseEvent) {
+		e.stopPropagation()
 		setModal(true)
 	}
 	function close() {

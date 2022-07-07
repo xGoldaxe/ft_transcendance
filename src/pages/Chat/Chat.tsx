@@ -222,7 +222,7 @@ export default function Chat() {
 	}, [searchParams])
 	
 	return (
-		<ModalBox>
+		<ModalBox noTop={true}>
 			<div className='Chat'>
 				<AllChannel />
 				

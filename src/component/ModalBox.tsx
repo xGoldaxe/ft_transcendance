@@ -1,10 +1,10 @@
 import React, { ReactElement } from 'react'
 import BigButton from './BigButton'
 
-export default function ModalBox({ children }: { children: JSX.Element }) {
+export default function ModalBox({ children, noTop }: {children: JSX.Element, noTop: boolean}) {
 
 	return (
-		<div className='ModalBox'>
+		<div className={`ModalBox ${noTop && 'ModalBox--noTop'}`}>
 			{children}
 			{/* <div className='ModalBox__title'>Random modal</div>
 			<div className='ModalBox__content'>
