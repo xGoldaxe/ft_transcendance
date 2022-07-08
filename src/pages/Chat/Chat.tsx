@@ -211,7 +211,7 @@ export default function Chat() {
 
 	useEffect(() => {
 		var roomId = searchParams.get('roomId')
-		if (roomId=== null)
+		if (roomId === null)
 		{
 			setRoom(null)
 			return
@@ -243,16 +243,17 @@ export default function Chat() {
 }
 
 function getChannelRoute(route: string | null) {
+	console.log(route)
 	if (route === null || route === 'home')
 		return (<ChatHome />)
-	else if (route === 'roon/home')
+	else if (route === 'room/home')
 		return (<ChatChannelHome />)
 	else if (route === 'room/settings')
 		return (<ChatChannelParameter />)
 	else if (route === 'room/join')
 		return (<ChatChannelJoin />)
 	else
-		return (<ChatChannelHome />)
+		return (<ChatHome />)
 }
 		
 

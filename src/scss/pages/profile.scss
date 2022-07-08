@@ -54,6 +54,13 @@
 		img {
 			width: 40px;
 			aspect-ratio: 1/1;
+			padding: 0 10px;
+			cursor: pointer;
+			transition: transform 0.1s ease-out;
+			&:hover
+			{
+				transform: scale(1.1);
+			}
 		}
 	}
 }

@@ -31,7 +31,6 @@ function App() {
 							</Routes>
 					</motion.div>
 				</div>
-				<Header />
 			</div>
 		</BrowserRouter>
 	);

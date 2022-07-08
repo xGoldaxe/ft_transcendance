@@ -3,6 +3,8 @@ import { useParams, useSearchParams } from 'react-router-dom'
 import ProfilBox, { NameWithMenu } from '../component/ProfilBox'
 import Page404 from './Page404'
 import addFriend from '../images/friendAdd.svg'
+import block from '../images/block.svg'
+import send from '../images/send.svg'
 
 interface resumeGame {
 	date: string,
@@ -85,6 +87,8 @@ export default function Profile() {
 			</div>
 			<div className='ProfilPage__menu'>
 				<img src={addFriend} alt=''/>
+				<img src={block} alt=''/>
+				<img src={send} alt=''/>
 			</div>
 			<Winrate />
 			<History name={name}/>

@@ -17,6 +17,16 @@ $dark-grey: #8F8A8A;
 			background-color: black;
 			max-height: 100%;
 		}
+		&__return {
+			display: block;
+			width: 40px;
+			padding: 5px;
+			border-radius: 3px;
+			margin: 10px 0;
+			background-color: $grey;
+			aspect-ratio: 1/1;
+			cursor: pointer;
+		}
 		padding: 7px 0;
 		z-index: 3;
 		padding: 0 10px;
@@ -219,6 +229,9 @@ $dark-grey: #8F8A8A;
 			&--container {
 				position: absolute;
 				z-index: 2;
+			}
+			&__return {
+				width: 30px;
 			}
 			&__image {
 				background-color: $grey;

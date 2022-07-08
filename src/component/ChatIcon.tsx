@@ -1,39 +1,44 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { motion } from "framer-motion"
 import Logo from '../images/talk.svg'
+import Send from '../images/whiteSend.svg'
+import Home from '../images/whiteHome.svg';
 import Chat from '../pages/Chat/Chat';
-import { useSearchParams } from 'react-router-dom'
-import { useModal } from './Modal';
+import { useNavigate, useSearchParams } from 'react-router-dom'
+import Modal, { useModal } from './Modal';
+import { homeSanitizeQuery, sanitizeQuery } from '../lib/queryString';
 
 export default function ChatIcon({ constraintsRef } :
 { constraintsRef: React.MutableRefObject<null> }) {
 
-	// const [draggin, setDraggin] = useState<boolean>(false);
-	var { isOpen, modal, setOpen } = useModal(<Chat />);
-	var [searchParams, setSearchParams] = useSearchParams();
+	const [open, setOpen] = useState<boolean>(false)
 
-	useEffect(()=>{
-		var isOpen = searchParams.get('chat')
-		if (isOpen === 'open')
-			setOpen(true)
-		else
-			setOpen(false)
-	}, [searchParams])
+
+	var [searchParams, setSearchParams] = useSearchParams();
+	function setOpenEvent() {
+		searchParams.delete('chat')
+		setSearchParams(searchParams, {replace: true})
+	}
 
 	useEffect(() => {
-		searchParams.delete('chat')
-		if (isOpen === true)
-			searchParams.append('chat', 'open')
+		if (searchParams.get('chat') === 'open')
+			setOpen(true)
+		else
+		{
+			searchParams.delete('get')
+			setOpen(false)
+		}
 		setSearchParams(searchParams, {replace: true})
-	}, [isOpen])
+	}, [searchParams])
 	
 	function onClick() {
-		setOpen(true)
+		searchParams.set('chat', 'open')
+		setSearchParams(searchParams, {replace: true})
 	}
+	let navigate = useNavigate()
 	function goHome() {
-		
+		navigate(`/?${homeSanitizeQuery(searchParams).toString()}`)
 	}
-
 	return (
 		<>
 			<motion.img
@@ -47,11 +52,11 @@ export default function ChatIcon({ constraintsRef } :
 			>
 			</motion.img>
 			<div className='chatBox'>
-				<img src={Logo} alt='' onClick={onClick}/>
-				<img src={Logo} alt='' onClick={goHome}/>
-				<img src={Logo} alt='' onClick={goHome}/>
+				<img src={Send} alt='' onClick={onClick}/>
+				<img src={Home} alt='' onClick={goHome}/>
+				<img src={Home} alt='' onClick={goHome}/>
 			</div>
-			{modal}
+			<Modal open={open} setOpen={setOpenEvent}><Chat /></Modal>
 		</>
 	)
 }
